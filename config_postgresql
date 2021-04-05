@@ -6,9 +6,9 @@ then
   exit 1
 fi
 
-sudo -u postgres createuser postgres
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+sudo -u postgres createuser designing_user
+sudo -u postgres psql -c "ALTER USER designing_user WITH PASSWORD 'postgres';"
 sudo -u postgres createdb designing
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE designing TO postgres;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE designing TO designing_user;"
 
 sudo -u postgres psql designing -f sql/create_policy.sql
