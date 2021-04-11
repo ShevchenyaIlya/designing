@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS group(
+    group_id BIGSERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(200)
+);
