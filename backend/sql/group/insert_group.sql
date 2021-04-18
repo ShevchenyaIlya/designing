@@ -1,4 +1,4 @@
-INSERT INTO group(
+INSERT INTO "group"(
     name,
     description
 ) VALUES (%s, %s)
