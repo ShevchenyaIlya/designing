@@ -11,16 +11,22 @@ sudo -u postgres psql -c "ALTER USER designing_user WITH PASSWORD 'postgres';"
 sudo -u postgres createdb designing
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE designing TO designing_user;"
 
-sudo -u postgres psql designing -f sql/create_policy.sql
-sudo -u postgres psql designing -f sql/create_group.sql
-sudo -u postgres psql designing -f sql/create_role.sql
-sudo -u postgres psql designing -f sql/create_position.sql
-sudo -u postgres psql designing -f sql/create_department.sql
-sudo -u postgres psql designing -f sql/create_unit.sql
-sudo -u postgres psql designing -f sql/create_user.sql
-sudo -u postgres psql designing -f sql/create_user_group.sql
-sudo -u postgres psql designing -f sql/create_user_role.sql
-sudo -u postgres psql designing -f sql/create_group_role.sql
-sudo -u postgres psql designing -f sql/create_role_policy.sql
+sudo -u postgres psql designing -f backend/sql/create_policy.sql
+sudo -u postgres psql designing -f backend/sql/create_group.sql
+sudo -u postgres psql designing -f backend/sql/create_role.sql
+sudo -u postgres psql designing -f backend/sql/create_position.sql
+sudo -u postgres psql designing -f backend/sql/create_department.sql
+sudo -u postgres psql designing -f backend/sql/create_unit.sql
+sudo -u postgres psql designing -f backend/sql/create_user.sql
+sudo -u postgres psql designing -f backend/sql/create_user_group.sql
+sudo -u postgres psql designing -f backend/sql/create_user_role.sql
+sudo -u postgres psql designing -f backend/sql/create_group_role.sql
+sudo -u postgres psql designing -f backend/sql/create_role_policy.sql
 sudo -u postgres psql designing -c 'ALTER TABLE department ADD CONSTRAINT departmentfk FOREIGN KEY (head_id) REFERENCES "user" (user_id);'
 sudo -u postgres psql designing -c 'ALTER TABLE unit ADD CONSTRAINT unitfk FOREIGN KEY (head_id) REFERENCES "user" (user_id);'
+sudo -u postgres psql designing -c 'ALTER TABLE department ALTER COLUMN head_id DROP NOT NULL;'
+sudo -u postgres psql designing -c 'ALTER TABLE department ALTER COLUMN head_id DROP NOT NULL;'
+sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN near_manager_id DROP NOT NULL;'
+sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN department_id DROP NOT NULL;'
+sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN unit_id DROP NOT NULL;'
+sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN position_id DROP NOT NULL;'
