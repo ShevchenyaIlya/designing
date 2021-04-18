@@ -10,4 +10,4 @@ INSERT INTO "user"(
       position_id
 )
 VALUES (%s, %s, %s, %s, %s, null, null, null, null)
-RETURNING user_id;
+RETURNING id;

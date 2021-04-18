@@ -11,19 +11,19 @@ sudo -u postgres psql -c "ALTER USER designing_user WITH PASSWORD 'postgres';"
 sudo -u postgres createdb designing
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE designing TO designing_user;"
 
-sudo -u postgres psql designing -f backend/sql/create_policy.sql
-sudo -u postgres psql designing -f backend/sql/create_group.sql
-sudo -u postgres psql designing -f backend/sql/create_role.sql
-sudo -u postgres psql designing -f backend/sql/create_position.sql
-sudo -u postgres psql designing -f backend/sql/create_department.sql
-sudo -u postgres psql designing -f backend/sql/create_unit.sql
-sudo -u postgres psql designing -f backend/sql/create_user.sql
-sudo -u postgres psql designing -f backend/sql/create_user_group.sql
-sudo -u postgres psql designing -f backend/sql/create_user_role.sql
-sudo -u postgres psql designing -f backend/sql/create_group_role.sql
-sudo -u postgres psql designing -f backend/sql/create_role_policy.sql
-sudo -u postgres psql designing -c 'ALTER TABLE department ADD CONSTRAINT departmentfk FOREIGN KEY (head_id) REFERENCES "user" (user_id);'
-sudo -u postgres psql designing -c 'ALTER TABLE unit ADD CONSTRAINT unitfk FOREIGN KEY (head_id) REFERENCES "user" (user_id);'
+sudo -u postgres psql designing -f backend/sql/policy/create_policy.sql
+sudo -u postgres psql designing -f backend/sql/group/create_group.sql
+sudo -u postgres psql designing -f backend/sql/role/create_role.sql
+sudo -u postgres psql designing -f backend/sql/position/create_position.sql
+sudo -u postgres psql designing -f backend/sql/department/create_department.sql
+sudo -u postgres psql designing -f backend/sql/unit/create_unit.sql
+sudo -u postgres psql designing -f backend/sql/user/create_user.sql
+sudo -u postgres psql designing -f backend/sql/user_group/create_user_group.sql
+sudo -u postgres psql designing -f backend/sql/user_role/create_user_role.sql
+sudo -u postgres psql designing -f backend/sql/group_role/create_group_role.sql
+sudo -u postgres psql designing -f backend/sql/role_policy/create_role_policy.sql
+sudo -u postgres psql designing -c 'ALTER TABLE department ADD CONSTRAINT departmentfk FOREIGN KEY (head_id) REFERENCES "user" (id);'
+sudo -u postgres psql designing -c 'ALTER TABLE unit ADD CONSTRAINT unitfk FOREIGN KEY (head_id) REFERENCES "user" (id);'
 sudo -u postgres psql designing -c 'ALTER TABLE department ALTER COLUMN head_id DROP NOT NULL;'
 sudo -u postgres psql designing -c 'ALTER TABLE department ALTER COLUMN head_id DROP NOT NULL;'
 sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN near_manager_id DROP NOT NULL;'
