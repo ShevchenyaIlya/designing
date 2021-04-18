@@ -103,3 +103,9 @@ def update_user(body: Dict) -> Dict:
         )
 
     return body
+
+
+def select_users() -> Dict:
+    response = db.select_users()
+
+    return response

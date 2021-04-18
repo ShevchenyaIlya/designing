@@ -30,3 +30,9 @@ def update_user() -> Tuple[Any, int]:
     body = request.get_json()
 
     return jsonify(service.update_user(body)), HTTPStatus.OK
+
+
+@users.route('/users', methods=["GET"])
+@jwt_required()
+def get_users() -> Tuple[Any, int]:
+    return jsonify(service.select_users()), HTTPStatus.OK
