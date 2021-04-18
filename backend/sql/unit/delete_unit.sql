@@ -1,0 +1,2 @@
+DELETE FROM unit
+WHERE id=%s;
