@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX unit_name_index ON unit (name);

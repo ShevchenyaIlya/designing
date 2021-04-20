@@ -11,6 +11,7 @@ sudo -u postgres psql -c "ALTER USER designing_user WITH PASSWORD 'postgres';"
 sudo -u postgres createdb designing
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE designing TO designing_user;"
 
+# Create tables
 sudo -u postgres psql designing -f backend/sql/policy/create_policy.sql
 sudo -u postgres psql designing -f backend/sql/group/create_group.sql
 sudo -u postgres psql designing -f backend/sql/role/create_role.sql
@@ -22,10 +23,12 @@ sudo -u postgres psql designing -f backend/sql/user_group/create_user_group.sql
 sudo -u postgres psql designing -f backend/sql/user_role/create_user_role.sql
 sudo -u postgres psql designing -f backend/sql/group_role/create_group_role.sql
 
+# Trigger
 sudo -u postgres psql designing -f backend/sql/user/create_user_audit.sql
 sudo -u postgres psql designing -f backend/sql/user/audit_trigger.sql
 sudo -u postgres psql designing -f backend/sql/user/rollback_user.sql
 
+# Change constraints and drop not null from fk of "user" table
 sudo -u postgres psql designing -c 'ALTER TABLE department ADD CONSTRAINT departmentfk FOREIGN KEY (head_id) REFERENCES "user" (id);'
 sudo -u postgres psql designing -c 'ALTER TABLE unit ADD CONSTRAINT unitfk FOREIGN KEY (head_id) REFERENCES "user" (id);'
 sudo -u postgres psql designing -c 'ALTER TABLE department ALTER COLUMN head_id DROP NOT NULL;'
@@ -34,3 +37,10 @@ sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN near_manager
 sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN department_id DROP NOT NULL;'
 sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN unit_id DROP NOT NULL;'
 sudo -u postgres psql designing -c 'ALTER TABLE "user" ALTER COLUMN position_id DROP NOT NULL;'
+
+# Create indexes
+sudo -u postgres psql designing -f backend/sql/user/email_index.sql
+sudo -u postgres psql designing -f backend/sql/department/name_index.sql
+sudo -u postgres psql designing -f backend/sql/unit/name_index.sql
+sudo -u postgres psql designing -f backend/sql/role/name_index.sql
+sudo -u postgres psql designing -f backend/sql/group/name_index.sql
