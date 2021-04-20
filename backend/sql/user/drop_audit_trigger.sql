@@ -1,0 +1,1 @@
+DROP TRIGGER user_audit on "user";
