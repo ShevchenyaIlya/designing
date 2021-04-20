@@ -9,5 +9,5 @@ INSERT INTO "user"(
       unit_id,
       position_id
 )
-VALUES (%s, %s, %s, %s, %s, null, null, null, null)
+VALUES (%s, %s, %s, %s, %s, NOW(), null, null, null)
 RETURNING id;

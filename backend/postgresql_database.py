@@ -76,7 +76,7 @@ class PostgreSQLHandler:
         self.cursor.execute(self.get_query("user", "select_user"), (email,))
         user = dict(self.cursor.fetchone())
         user.pop("password", None)
-        user.pop("user_id", None)
+        user.pop("id", None)
 
         return user
 
@@ -120,7 +120,7 @@ class PostgreSQLHandler:
         if response is None:
             return response
 
-        return response["user_id"], response["password"]
+        return response["id"], response["password"]
 
     def close_connection(self):
         self.connection.close()
