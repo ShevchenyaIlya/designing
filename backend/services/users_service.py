@@ -3,7 +3,7 @@ from typing import Dict
 
 from flask_jwt_extended import create_access_token
 from http_exception import HTTPException
-from postgresql_database import DATABASE as db
+from models import DATABASE as db
 from validators import validate_password
 from werkzeug.security import check_password_hash, generate_password_hash
 
