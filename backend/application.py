@@ -1,6 +1,8 @@
 import os
 
 from api.auth import auth
+from api.departments import departments
+from api.units import units
 from api.users import users
 from config import CONFIG
 from flask import Flask, Response, jsonify
@@ -18,6 +20,8 @@ def create_flask_app() -> Flask:
 
     application.register_blueprint(auth)
     application.register_blueprint(users)
+    application.register_blueprint(departments)
+    application.register_blueprint(units)
 
     return application
 
