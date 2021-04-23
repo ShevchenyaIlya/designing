@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
 import psycopg2
 from psycopg2.extensions import AsIs
@@ -15,7 +15,7 @@ def load_database_connection_settings():
         return json.load(json_file)
 
 
-def database_connection(connection_settings):
+def database_connection(connection_settings: Dict):
     """
     Get connection to database from 'connection_settings'
     """
@@ -23,7 +23,7 @@ def database_connection(connection_settings):
     return psycopg2.connect(**connection_settings)
 
 
-def load_query(filename):
+def load_query(filename: str):
     """
     Load SQL query from files as text
     """
@@ -80,11 +80,11 @@ class PostgreSQLHandler:
 
 
 class UserModel(PostgreSQLHandler):
-    def user_exist(self, email: str):
+    def user_exist(self, email: str) -> bool:
         self.cursor.execute(self.get_query("user", "user_exists"), (email,))
         return self.cursor.fetchall()[0][0]
 
-    def insert_user(self, user: Dict):
+    def insert_user(self, user: Dict) -> int:
         if not self.user_exist(user["email"]):
             self.cursor.execute(
                 self.get_query("user", "insert_user"),
@@ -100,7 +100,7 @@ class UserModel(PostgreSQLHandler):
 
             return self.cursor.fetchone()[0]
 
-    def select_user(self, email: str):
+    def select_user(self, email: str) -> Dict:
         self.cursor.execute(self.get_query("user", "select_user"), (email,))
         user = dict(self.cursor.fetchone())
         user.pop("password", None)
@@ -108,7 +108,7 @@ class UserModel(PostgreSQLHandler):
 
         return user
 
-    def select_users(self):
+    def select_users(self) -> List[Dict]:
         self.cursor.execute(self.get_query("user", "select_users"))
         users = self.cursor.fetchall()
 
@@ -117,13 +117,13 @@ class UserModel(PostgreSQLHandler):
 
         return users
 
-    def delete_user(self, email: str):
+    def delete_user(self, email: str) -> bool:
         self.cursor.execute(self.get_query("user", "delete_user"), (email,))
         self.connection.commit()
 
         return bool(self.cursor.rowcount)
 
-    def update_user(self, user: Dict):
+    def update_user(self, user: Dict) -> bool:
         self.cursor.execute(
             self.get_query("user", "update_user"),
             (
@@ -141,32 +141,43 @@ class UserModel(PostgreSQLHandler):
 
         return bool(self.cursor.rowcount)
 
-    def find_user_by_email(self, email: str):
+    def find_user_by_email(self, email: str) -> Optional[Tuple[int, str]]:
         self.cursor.execute(self.get_query("user", "select_user"), (email,))
         response = self.cursor.fetchone()
 
         if response is None:
             return response
 
-        return response["id"], response["password"]
+        return response[0], response["password"]
 
 
 class DepartmentModel(PostgreSQLHandler):
-    def select_departments(self):
+    def select_departments(self) -> List[Dict]:
         self.cursor.execute(self.get_query("department", "select_departments"))
         departments = self.cursor.fetchall()
 
         return convert_row_to_dictionary(departments)
 
-    def select_single_department(self, name):
+    def select_department_by_name(self, name: str):
         self.cursor.execute(
-            self.get_query("department", "select_single_department"), (name,)
+            self.get_query("department", "select_department_by_name"), (name,)
         )
         department = dict(self.cursor.fetchone())
 
         return department
 
-    def delete_department(self, identifier: str):
+    def select_department_by_id(self, department_id: int) -> Optional[Dict]:
+        self.cursor.execute(
+            self.get_query("department", "select_department_by_id"), (department_id,)
+        )
+        department = self.cursor.fetchone()
+
+        if department is not None:
+            return dict(department)
+
+        return None
+
+    def delete_department(self, identifier: str) -> bool:
         self.cursor.execute(
             self.get_query("department", "delete_department"), (identifier,)
         )
@@ -174,7 +185,7 @@ class DepartmentModel(PostgreSQLHandler):
 
         return bool(self.cursor.rowcount)
 
-    def insert_department(self, department: Dict):
+    def insert_department(self, department: Dict) -> int:
         if not self.department_exists(department["name"]):
             self.cursor.execute(
                 self.get_query("department", "insert_department"),
@@ -188,14 +199,14 @@ class DepartmentModel(PostgreSQLHandler):
 
             return self.cursor.fetchone()[0]
 
-    def update_department(self, department):
+    def update_department(self, department_id, department) -> bool:
         self.cursor.execute(
             self.get_query("department", "update_department"),
             (
                 department.get("name", None),
                 department.get("description", None),
                 department.get("head_id", None),
-                department["id"],
+                department_id,
             ),
         )
 
@@ -203,72 +214,10 @@ class DepartmentModel(PostgreSQLHandler):
 
         return bool(self.cursor.rowcount)
 
-    def department_exists(self, name: str):
+    def department_exists(self, name: str) -> bool:
         self.cursor.execute(self.get_query("department", "department_exists"), (name,))
         return self.cursor.fetchall()[0][0]
 
 
-class UnitModel(PostgreSQLHandler):
-    def select_units(self):
-        self.cursor.execute(self.get_query("unit", "select_units"))
-        units = self.cursor.fetchall()
-
-        return convert_row_to_dictionary(units)
-
-    def select_department_units(self, department_id):
-        self.cursor.execute(
-            self.get_query("unit", "select_department_units"), (department_id,)
-        )
-        units = self.cursor.fetchall()
-
-        return convert_row_to_dictionary(units)
-
-    def select_single_unit(self, name):
-        self.cursor.execute(self.get_query("unit", "select_single_unit"), (name,))
-        unit = dict(self.cursor.fetchone())
-
-        return unit
-
-    def delete_unit(self, identifier: str):
-        self.cursor.execute(self.get_query("unit", "delete_unit"), (identifier,))
-        self.connection.commit()
-
-        return bool(self.cursor.rowcount)
-
-    def insert_unit(self, unit: Dict):
-        if not self.unit_exists(unit["name"]):
-            self.cursor.execute(
-                self.get_query("unit", "insert_unit"),
-                (
-                    unit["name"],
-                    unit["description"],
-                    unit["department_id"],
-                    unit["head_id"],
-                ),
-            )
-            self.connection.commit()
-
-            return self.cursor.fetchone()[0]
-
-    def update_unit(self, unit):
-        self.cursor.execute(
-            self.get_query("unit", "update_unit"),
-            (
-                unit.get("name", None),
-                unit.get("description", None),
-                unit.get("department_id", None),
-                unit.get("head_id", None),
-                unit["id"],
-            ),
-        )
-
-        self.connection.commit()
-
-        return bool(self.cursor.rowcount)
-
-    def unit_exists(self, name: str):
-        self.cursor.execute(self.get_query("unit", "unit_exists"), (name,))
-        return self.cursor.fetchall()[0][0]
-
-
-DATABASE = UserModel()
+users = UserModel()
+departments = DepartmentModel()
