@@ -59,7 +59,7 @@ def insert_department(body: Dict):
             "Department exist or something went wrong", HTTPStatus.FORBIDDEN
         )
 
-    return department_id
+    return {"id": department_id}
 
 
 def update_department(department_id: int, body: Dict):

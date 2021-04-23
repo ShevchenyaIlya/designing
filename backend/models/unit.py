@@ -1,9 +1,4 @@
-import json
 from typing import Dict, List, Optional, Tuple
-
-import psycopg2
-from psycopg2.extensions import AsIs
-from psycopg2.extras import DictCursor
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
 
@@ -23,8 +18,8 @@ class UnitModel(PostgreSQLHandler):
 
         return convert_row_to_dictionary(units)
 
-    def select_single_unit(self, name: str) -> Optional[Dict]:
-        self.cursor.execute(self.get_query("unit", "select_single_unit"), (name,))
+    def select_single_unit(self, identifier: int) -> Optional[Dict]:
+        self.cursor.execute(self.get_query("unit", "select_unit_by_id"), (identifier,))
         unit = self.cursor.fetchone()
 
         if unit is not None:
@@ -32,7 +27,7 @@ class UnitModel(PostgreSQLHandler):
 
         return None
 
-    def delete_unit(self, identifier: str) -> bool:
+    def delete_unit(self, identifier: int) -> bool:
         self.cursor.execute(self.get_query("unit", "delete_unit"), (identifier,))
         self.connection.commit()
 
@@ -53,7 +48,7 @@ class UnitModel(PostgreSQLHandler):
 
             return self.cursor.fetchone()[0]
 
-    def update_unit(self, unit: Dict) -> bool:
+    def update_unit(self, unit_id: int, unit: Dict) -> bool:
         self.cursor.execute(
             self.get_query("unit", "update_unit"),
             (
@@ -61,7 +56,7 @@ class UnitModel(PostgreSQLHandler):
                 unit.get("description", None),
                 unit.get("department_id", None),
                 unit.get("head_id", None),
-                unit["id"],
+                unit_id,
             ),
         )
 
