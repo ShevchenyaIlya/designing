@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Dict, List
 
 from http_exception import HTTPException
-from models import departments as db
+from models.department import departments as db
 from psycopg2 import Error
 
 
