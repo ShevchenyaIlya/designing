@@ -4,6 +4,7 @@ from typing import Any, Tuple
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from services import users_service as service
+from services.content_type_validation import content_type_validation
 
 users: Blueprint = Blueprint('users', __name__, url_prefix="/api/v1")
 
@@ -19,6 +20,7 @@ def profile() -> Tuple[Any, int]:
 @users.route('/users', methods=["DELETE"])
 @jwt_required()
 def delete_user() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.delete_user(body)), HTTPStatus.OK
@@ -27,6 +29,7 @@ def delete_user() -> Tuple[Any, int]:
 @users.route('/users', methods=["PUT", "PATCH"])
 @jwt_required()
 def update_user() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.update_user(body)), HTTPStatus.OK

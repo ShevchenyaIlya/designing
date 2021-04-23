@@ -4,6 +4,7 @@ from typing import Any, Tuple
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from services import departments_service as service
+from services.content_type_validation import content_type_validation
 
 departments: Blueprint = Blueprint('departments', __name__, url_prefix="/api/v1")
 
@@ -23,6 +24,7 @@ def select_single_department(department_id: int) -> Tuple[Any, int]:
 @departments.route('/departments', methods=["POST"])
 @jwt_required()
 def insert_department() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.insert_department(body)), HTTPStatus.OK
@@ -31,6 +33,7 @@ def insert_department() -> Tuple[Any, int]:
 @departments.route('/departments/<int:department_id>', methods=["PUT", "PATCH"])
 @jwt_required()
 def update_department(department_id: int) -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.update_department(department_id, body)), HTTPStatus.OK

@@ -23,3 +23,10 @@ def validate_password(password):
         return None
 
     return True
+
+
+def validate_content_type(content_type: str) -> bool:
+    if content_type == "application/json":
+        return True
+
+    return False

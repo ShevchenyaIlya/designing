@@ -4,6 +4,7 @@ from typing import Any, Tuple
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from services import units_service as service
+from services.content_type_validation import content_type_validation
 
 units: Blueprint = Blueprint('units', __name__, url_prefix="/api/v1")
 
@@ -11,6 +12,7 @@ units: Blueprint = Blueprint('units', __name__, url_prefix="/api/v1")
 @units.route('/units', methods=["GET"])
 @jwt_required()
 def select_units() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.select_units(body)), HTTPStatus.OK
@@ -25,6 +27,7 @@ def select_single_unit(unit_id: int) -> Tuple[Any, int]:
 @units.route('/units', methods=["POST"])
 @jwt_required()
 def insert_unit() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.insert_unit(body)), HTTPStatus.OK
@@ -33,6 +36,7 @@ def insert_unit() -> Tuple[Any, int]:
 @units.route('/units/<int:unit_id>', methods=["PUT", "PATCH"])
 @jwt_required()
 def update_unit(unit_id: str) -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
     return jsonify(service.update_unit(unit_id, body)), HTTPStatus.OK
