@@ -74,5 +74,8 @@ class UserModel(PostgreSQLHandler):
 
         return response[0], response["password"]
 
+    def select_user_roles(self, identifier: int):
+        pass
+
 
 users = UserModel()
