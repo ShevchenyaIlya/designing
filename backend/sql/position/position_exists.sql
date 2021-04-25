@@ -1,0 +1,1 @@
+SELECT exists(SELECT id FROM position WHERE name=%s);
