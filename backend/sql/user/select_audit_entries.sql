@@ -1,0 +1,1 @@
+SELECT * FROM user_audit WHERE action_time>=TO_TIMESTAMP(%s);

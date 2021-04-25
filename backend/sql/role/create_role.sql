@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS role(
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(200)
+);

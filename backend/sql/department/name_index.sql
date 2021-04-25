@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX department_name_index ON department (name);

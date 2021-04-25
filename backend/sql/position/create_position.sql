@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS position(
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    level INTEGER
+);
