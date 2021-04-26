@@ -161,3 +161,54 @@ def delete_user_role(user_id: Optional[int], role_id: Optional[int]) -> Dict:
         )
 
     return {}
+
+
+def select_user_groups(user_id: int) -> List:
+    roles = db.select_user_groups(user_id)
+
+    return roles
+
+
+def insert_user_group(body: Dict):
+    if not body:
+        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+
+    fields = ['user_id', 'group_id']
+
+    if any(field not in body for field in fields):
+        raise HTTPException(
+            "Incorrect body content for adding user to group", HTTPStatus.BAD_REQUEST
+        )
+
+    try:
+        user_group_id = db.insert_user_group(body["user_id"], body["group_id"])
+    except Error:
+        raise HTTPException(
+            "Invalid data for adding user to group", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
+
+    return {"id": user_group_id}
+
+
+def delete_user_group(user_id: Optional[int], group_id: Optional[int]) -> Dict:
+    if user_id is None or group_id is None:
+        raise HTTPException(
+            "No query parameters for deleting user group",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    try:
+        response = db.delete_user_group(user_id, group_id)
+    except Error:
+        raise HTTPException(
+            "Invalid query parameters for deleting user group",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Delete operation have no effect. Such user group does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return {}

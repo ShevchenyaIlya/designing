@@ -102,8 +102,33 @@ class UserModel(PostgreSQLHandler):
 
         return roles
 
-    def select_user_groups(self, identifier: int):
-        pass
+    def insert_user_group(self, user_id: int, group_id: int):
+        self.cursor.execute(
+            self.get_query("user_group", "insert_user_group"),
+            (group_id, user_id),
+        )
+        self.connection.commit()
+
+        return self.cursor.fetchone()[0]
+
+    def delete_user_group(self, user_id: int, group_id: int):
+        self.cursor.execute(
+            self.get_query("user_group", "delete_user_group"), (user_id, group_id)
+        )
+        self.connection.commit()
+
+        return bool(self.cursor.rowcount)
+
+    def select_user_groups(self, user_id: int):
+        self.cursor.execute(
+            self.get_query("user_group", "select_user_groups"), (user_id,)
+        )
+        roles = self.cursor.fetchall()
+
+        for index, role in enumerate(roles):
+            roles[index] = dict(role)
+
+        return roles
 
     def select_user_policies(self, identifier: int):
         pass

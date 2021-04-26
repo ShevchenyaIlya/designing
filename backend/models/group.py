@@ -84,8 +84,16 @@ class GroupModel(PostgreSQLHandler):
 
         return roles
 
-    def select_users_in_group(self):
-        pass
+    def select_users_in_group(self, group_id: int):
+        self.cursor.execute(
+            self.get_query("user_group", "select_users_in_group"), (group_id,)
+        )
+        users = self.cursor.fetchall()
+
+        for index, user in enumerate(users):
+            users[index] = dict(user)
+
+        return users
 
 
 groups = GroupModel()

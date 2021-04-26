@@ -15,6 +15,12 @@ def select_groups() -> Tuple[Any, int]:
     return jsonify(service.select_groups()), HTTPStatus.OK
 
 
+@groups.route('/users-in-group/<int:group_id>', methods=["GET"])
+@jwt_required()
+def select_users_in_group(group_id: int) -> Tuple[Any, int]:
+    return jsonify(service.select_users_in_group(group_id)), HTTPStatus.OK
+
+
 @groups.route('/groups/<int:group_id>', methods=["GET"])
 @jwt_required()
 def select_single_group(group_id: int) -> Tuple[Any, int]:

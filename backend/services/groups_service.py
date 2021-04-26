@@ -12,6 +12,12 @@ def select_groups() -> List:
     return groups
 
 
+def select_users_in_group(group_id: int) -> List:
+    users = db.select_users_in_group(group_id)
+
+    return users
+
+
 def select_single_group(group_id: int):
     group = db.select_group_by_id(group_id)
 
