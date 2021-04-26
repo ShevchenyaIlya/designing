@@ -1,1 +1,1 @@
-SELECT exists(SELECT id FROM position WHERE name=%s);
+SELECT exists(SELECT id FROM position WHERE title=%s);

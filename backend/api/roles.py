@@ -12,10 +12,7 @@ roles: Blueprint = Blueprint('roles', __name__, url_prefix="/api/v1")
 @roles.route('/roles', methods=["GET"])
 @jwt_required()
 def select_roles() -> Tuple[Any, int]:
-    content_type_validation(request.headers["Content-Type"])
-    body = request.get_json()
-
-    return jsonify(service.select_roles(body)), HTTPStatus.OK
+    return jsonify(service.select_roles()), HTTPStatus.OK
 
 
 @roles.route('/roles/<int:role_id>', methods=["GET"])
@@ -39,10 +36,10 @@ def update_role(role_id: str) -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.update_unit(role_id, body)), HTTPStatus.OK
+    return jsonify(service.update_role(role_id, body)), HTTPStatus.OK
 
 
 @roles.route('/roles/<int:role_id>', methods=["DELETE"])
 @jwt_required()
 def delete_role(role_id: int) -> Tuple[Any, int]:
-    return jsonify(service.delete_unit(role_id)), HTTPStatus.OK
+    return jsonify(service.delete_role(role_id)), HTTPStatus.OK

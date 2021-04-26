@@ -12,10 +12,7 @@ policies: Blueprint = Blueprint('policies', __name__, url_prefix="/api/v1")
 @policies.route('/policies', methods=["GET"])
 @jwt_required()
 def select_policies() -> Tuple[Any, int]:
-    content_type_validation(request.headers["Content-Type"])
-    body = request.get_json()
-
-    return jsonify(service.select_policies(body)), HTTPStatus.OK
+    return jsonify(service.select_policies()), HTTPStatus.OK
 
 
 @policies.route('/policies/<int:policy_id>', methods=["GET"])

@@ -2,6 +2,10 @@ import os
 
 from api.auth import auth
 from api.departments import departments
+from api.groups import groups
+from api.policies import policies
+from api.positions import positions
+from api.roles import roles
 from api.units import units
 from api.users import users
 from config import CONFIG
@@ -22,6 +26,10 @@ def create_flask_app() -> Flask:
     application.register_blueprint(users)
     application.register_blueprint(departments)
     application.register_blueprint(units)
+    application.register_blueprint(groups)
+    application.register_blueprint(roles)
+    application.register_blueprint(positions)
+    application.register_blueprint(policies)
 
     return application
 

@@ -12,10 +12,7 @@ groups: Blueprint = Blueprint('groups', __name__, url_prefix="/api/v1")
 @groups.route('/groups', methods=["GET"])
 @jwt_required()
 def select_groups() -> Tuple[Any, int]:
-    content_type_validation(request.headers["Content-Type"])
-    body = request.get_json()
-
-    return jsonify(service.select_groups(body)), HTTPStatus.OK
+    return jsonify(service.select_groups()), HTTPStatus.OK
 
 
 @groups.route('/groups/<int:group_id>', methods=["GET"])

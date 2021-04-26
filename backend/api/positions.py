@@ -12,10 +12,7 @@ positions: Blueprint = Blueprint('positions', __name__, url_prefix="/api/v1")
 @positions.route('/positions', methods=["GET"])
 @jwt_required()
 def select_units() -> Tuple[Any, int]:
-    content_type_validation(request.headers["Content-Type"])
-    body = request.get_json()
-
-    return jsonify(service.select_positions(body)), HTTPStatus.OK
+    return jsonify(service.select_positions()), HTTPStatus.OK
 
 
 @positions.route('/positions/<int:position_id>', methods=["GET"])
@@ -45,4 +42,4 @@ def update_position(position_id: str) -> Tuple[Any, int]:
 @positions.route('/positions/<int:position_id>', methods=["DELETE"])
 @jwt_required()
 def delete_position(position_id: int) -> Tuple[Any, int]:
-    return jsonify(service.delete_unit(position_id)), HTTPStatus.OK
+    return jsonify(service.delete_position(position_id)), HTTPStatus.OK
