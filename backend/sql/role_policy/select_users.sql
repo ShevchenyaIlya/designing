@@ -1,1 +1,1 @@
-SELECT * FROM "user";
+SELECT * FROM role_policy;

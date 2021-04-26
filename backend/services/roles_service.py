@@ -81,3 +81,61 @@ def update_role(role_id: int, body: Dict):
         )
 
     return body
+
+
+def select_role_policies(role_id: int) -> List:
+    policies = db.select_role_policies(role_id)
+
+    return policies
+
+
+def insert_role_policy(body: Dict):
+    if not body:
+        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+
+    fields = ['role_id', 'policy_id', 'department_id', 'target_user_id']
+
+    if any(field not in body for field in fields):
+        raise HTTPException(
+            "Incorrect body content for adding new policy to role",
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    try:
+        role_policy_id = db.insert_role_policy(body)
+    except Error:
+        raise HTTPException(
+            "Invalid data for adding new policy to role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    return {"id": role_policy_id}
+
+
+def delete_user_group(body: Dict) -> Dict:
+    if not body:
+        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+
+    fields = ['role_id', 'policy_id', 'department_id', 'target_user_id']
+
+    if any(field not in body for field in fields):
+        raise HTTPException(
+            "Incorrect body content for adding new policy to role",
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    try:
+        response = db.delete_role_policy(body)
+    except Error:
+        raise HTTPException(
+            "Invalid query parameters for deleting role policy",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Delete operation have no effect. Such role policy does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return {}

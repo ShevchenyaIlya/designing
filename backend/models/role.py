@@ -30,9 +30,6 @@ class RoleModel(PostgreSQLHandler):
 
         return users
 
-    def select_role_policies(self):
-        pass
-
     def select_role_with_policy(self):
         pass
 
@@ -81,6 +78,45 @@ class RoleModel(PostgreSQLHandler):
     def role_exists(self, name: str) -> bool:
         self.cursor.execute(self.get_query("role", "role_exists"), (name,))
         return self.cursor.fetchall()[0][0]
+
+    def insert_role_policy(self, body: Dict):
+        self.cursor.execute(
+            self.get_query("role_policy", "insert_role_policy"),
+            (
+                body["role_id"],
+                body["policy_id"],
+                body["department_id"],
+                body["target_user_id"],
+            ),
+        )
+        self.connection.commit()
+
+        return self.cursor.fetchone()[0]
+
+    def delete_role_policy(self, body: Dict):
+        self.cursor.execute(
+            self.get_query("role_policy", "delete_user_group"),
+            (
+                body["role_id"],
+                body["policy_id"],
+                body["department_id"],
+                body["target_user_id"],
+            ),
+        )
+        self.connection.commit()
+
+        return bool(self.cursor.rowcount)
+
+    def select_role_policies(self, role_id: int):
+        self.cursor.execute(
+            self.get_query("role_policy", "select_role_policies"), (role_id,)
+        )
+        policies = self.cursor.fetchall()
+
+        for index, policy in enumerate(policies):
+            policies[index] = dict(policy)
+
+        return policies
 
 
 roles = RoleModel()

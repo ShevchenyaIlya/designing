@@ -49,3 +49,27 @@ def update_role(role_id: str) -> Tuple[Any, int]:
 @jwt_required()
 def delete_role(role_id: int) -> Tuple[Any, int]:
     return jsonify(service.delete_role(role_id)), HTTPStatus.OK
+
+
+@roles.route('/role-policies/<int:role_id>', methods=["GET"])
+@jwt_required()
+def select_role_policies(role_id: int) -> Tuple[Any, int]:
+    return jsonify(service.select_role_policies(role_id)), HTTPStatus.OK
+
+
+@roles.route('/role-policies', methods=["POST"])
+@jwt_required()
+def set_role_policy() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
+    body = request.get_json()
+
+    return jsonify(service.insert_user_group(body)), HTTPStatus.OK
+
+
+@roles.route('/role-policies', methods=["DELETE"])
+@jwt_required()
+def delete_role_policy() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
+    body = request.get_json()
+
+    return jsonify(service.delete_role_policy(body)), HTTPStatus.OK
