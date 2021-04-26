@@ -30,8 +30,16 @@ class RoleModel(PostgreSQLHandler):
 
         return users
 
-    def select_role_with_policy(self):
-        pass
+    def select_roles_with_policy(self, policy_id: int):
+        self.cursor.execute(
+            self.get_query("role_policy", "select_roles_with_policy"), (policy_id,)
+        )
+        roles = self.cursor.fetchall()
+
+        for index, role in enumerate(roles):
+            roles[index] = dict(role)
+
+        return roles
 
     def select_single_role(self, identifier: int) -> Optional[Dict]:
         self.cursor.execute(self.get_query("role", "select_single_role"), (identifier,))

@@ -130,8 +130,14 @@ class UserModel(PostgreSQLHandler):
 
         return roles
 
-    def select_user_policies(self, identifier: int):
-        pass
+    def select_user_policies(self, user_id: int):
+        self.cursor.execute(self.get_query("user", "select_user_policies"), (user_id,))
+        policies = self.cursor.fetchall()
+
+        for index, policy in enumerate(policies):
+            policies[index] = dict(policy)
+
+        return policies
 
 
 users = UserModel()
