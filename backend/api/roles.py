@@ -15,6 +15,12 @@ def select_roles() -> Tuple[Any, int]:
     return jsonify(service.select_roles()), HTTPStatus.OK
 
 
+@roles.route('/users-with-role/<int:role_id>', methods=["GET"])
+@jwt_required()
+def select_users_with_roles(role_id: int) -> Tuple[Any, int]:
+    return jsonify(service.select_users_with_role(role_id)), HTTPStatus.OK
+
+
 @roles.route('/roles/<int:role_id>', methods=["GET"])
 @jwt_required()
 def select_single_role(role_id: int) -> Tuple[Any, int]:

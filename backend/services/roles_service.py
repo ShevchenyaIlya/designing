@@ -12,6 +12,12 @@ def select_roles() -> List:
     return roles
 
 
+def select_users_with_role(role_id: int) -> List:
+    users = db.select_users_with_role(role_id)
+
+    return users
+
+
 def select_single_role(role_id: int):
     role = db.select_role_by_id(role_id)
 

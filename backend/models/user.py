@@ -74,7 +74,38 @@ class UserModel(PostgreSQLHandler):
 
         return response[0], response["password"]
 
-    def select_user_roles(self, identifier: int):
+    def insert_user_role(self, user_id: int, role_id: int):
+        self.cursor.execute(
+            self.get_query("user_role", "insert_user_role"),
+            (user_id, role_id),
+        )
+        self.connection.commit()
+
+        return self.cursor.fetchone()[0]
+
+    def delete_user_role(self, user_id: int, role_id: int):
+        self.cursor.execute(
+            self.get_query("user_role", "delete_user_role"), (user_id, role_id)
+        )
+        self.connection.commit()
+
+        return bool(self.cursor.rowcount)
+
+    def select_user_roles(self, user_id: int):
+        self.cursor.execute(
+            self.get_query("user_role", "select_user_roles"), (user_id,)
+        )
+        roles = self.cursor.fetchall()
+
+        for index, role in enumerate(roles):
+            roles[index] = dict(role)
+
+        return roles
+
+    def select_user_groups(self, identifier: int):
+        pass
+
+    def select_user_policies(self, identifier: int):
         pass
 
 

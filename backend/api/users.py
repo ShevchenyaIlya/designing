@@ -39,3 +39,27 @@ def update_user() -> Tuple[Any, int]:
 @jwt_required()
 def get_users() -> Tuple[Any, int]:
     return jsonify(service.select_users()), HTTPStatus.OK
+
+
+@users.route('/user-roles/<int:user_id>', methods=["GET"])
+@jwt_required()
+def select_user_roles(user_id: int) -> Tuple[Any, int]:
+    return jsonify(service.select_user_roles(user_id)), HTTPStatus.OK
+
+
+@users.route('/user-roles', methods=["POST"])
+@jwt_required()
+def set_user_role() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
+    body = request.get_json()
+
+    return jsonify(service.insert_user_role(body)), HTTPStatus.OK
+
+
+@users.route('/user-roles', methods=["DELETE"])
+@jwt_required()
+def delete_user_role() -> Tuple[Any, int]:
+    user_id = request.args.get('user_id', None)
+    role_id = request.args.get('role_id', None)
+
+    return jsonify(service.delete_user_role(user_id, role_id)), HTTPStatus.OK

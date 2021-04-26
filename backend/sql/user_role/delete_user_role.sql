@@ -1,2 +1,2 @@
 DELETE FROM user_role
-WHERE id=%s;
+WHERE user_id=%s AND role_id=%s;

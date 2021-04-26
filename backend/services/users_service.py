@@ -1,9 +1,10 @@
 from http import HTTPStatus
-from typing import Dict
+from typing import Dict, List, Optional
 
 from flask_jwt_extended import create_access_token
 from http_exception import HTTPException
 from models.user import users as db
+from psycopg2 import Error
 from validators import validate_password
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -109,3 +110,59 @@ def select_users() -> Dict:
     response = db.select_users()
 
     return response
+
+
+def select_user_roles(user_id: int) -> List:
+    roles = db.select_user_roles(user_id)
+
+    return roles
+
+
+def insert_user_role(body: Dict):
+    if not body:
+        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+
+    fields = ['user_id', 'role_id']
+
+    if any(field not in body for field in fields):
+        raise HTTPException(
+            "Incorrect body content for adding new user role", HTTPStatus.BAD_REQUEST
+        )
+
+    try:
+        user_role_id = db.insert_user_role(body["user_id"], body["role_id"])
+    except Error:
+        raise HTTPException(
+            "Invalid data for adding new user role", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
+
+    if not user_role_id:
+        raise HTTPException(
+            "Department exist or something went wrong", HTTPStatus.FORBIDDEN
+        )
+
+    return {"id": user_role_id}
+
+
+def delete_user_role(user_id: Optional[int], role_id: Optional[int]) -> Dict:
+    if user_id is None or role_id is None:
+        raise HTTPException(
+            "No query parameters for deleting user role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    try:
+        response = db.delete_user_role(user_id, role_id)
+    except Error:
+        raise HTTPException(
+            "Invalid query parameters for deleting user role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Delete operation have no effect. Such user role does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return {}

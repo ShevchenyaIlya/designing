@@ -56,5 +56,11 @@ class GroupModel(PostgreSQLHandler):
         self.cursor.execute(self.get_query("group", "group_exists"), (name,))
         return self.cursor.fetchall()[0][0]
 
+    def select_users_in_group(self):
+        pass
+
+    def select_group_roles(self):
+        pass
+
 
 groups = GroupModel()
