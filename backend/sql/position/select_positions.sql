@@ -1,1 +1,1 @@
-SELECT title, level FROM position;
+SELECT id, title, level FROM position;
