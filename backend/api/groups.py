@@ -43,3 +43,27 @@ def update_group(group_id: str) -> Tuple[Any, int]:
 @jwt_required()
 def delete_group(group_id: int) -> Tuple[Any, int]:
     return jsonify(service.delete_group(group_id)), HTTPStatus.OK
+
+
+@groups.route('/group-roles/<int:group_id>', methods=["GET"])
+@jwt_required()
+def select_group_roles(group_id: int) -> Tuple[Any, int]:
+    return jsonify(service.select_group_roles(group_id)), HTTPStatus.OK
+
+
+@groups.route('/group-roles', methods=["POST"])
+@jwt_required()
+def set_group_role() -> Tuple[Any, int]:
+    content_type_validation(request.headers["Content-Type"])
+    body = request.get_json()
+
+    return jsonify(service.insert_group_role(body)), HTTPStatus.OK
+
+
+@groups.route('/group-roles', methods=["DELETE"])
+@jwt_required()
+def delete_user_role() -> Tuple[Any, int]:
+    group_id = request.args.get('group_id', None)
+    role_id = request.args.get('role_id', None)
+
+    return jsonify(service.delete_group_role(group_id, role_id)), HTTPStatus.OK

@@ -136,11 +136,6 @@ def insert_user_role(body: Dict):
             "Invalid data for adding new user role", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not user_role_id:
-        raise HTTPException(
-            "Department exist or something went wrong", HTTPStatus.FORBIDDEN
-        )
-
     return {"id": user_role_id}
 
 

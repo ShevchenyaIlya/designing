@@ -56,10 +56,35 @@ class GroupModel(PostgreSQLHandler):
         self.cursor.execute(self.get_query("group", "group_exists"), (name,))
         return self.cursor.fetchall()[0][0]
 
-    def select_users_in_group(self):
-        pass
+    def insert_group_role(self, group_id: int, role_id: int):
+        self.cursor.execute(
+            self.get_query("group_role", "insert_group_role"),
+            (group_id, role_id),
+        )
+        self.connection.commit()
 
-    def select_group_roles(self):
+        return self.cursor.fetchone()[0]
+
+    def delete_group_role(self, group_id: int, role_id: int):
+        self.cursor.execute(
+            self.get_query("group_role", "delete_group_role"), (group_id, role_id)
+        )
+        self.connection.commit()
+
+        return bool(self.cursor.rowcount)
+
+    def select_group_roles(self, group_id: int):
+        self.cursor.execute(
+            self.get_query("group_role", "select_group_roles"), (group_id,)
+        )
+        roles = self.cursor.fetchall()
+
+        for index, role in enumerate(roles):
+            roles[index] = dict(role)
+
+        return roles
+
+    def select_users_in_group(self):
         pass
 
 

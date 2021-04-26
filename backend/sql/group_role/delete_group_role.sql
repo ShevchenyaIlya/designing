@@ -1,2 +1,2 @@
 DELETE FROM group_role
-WHERE id=%s;
+WHERE group_id=%s AND role_id=%s;

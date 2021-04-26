@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from http_exception import HTTPException
 from models.group import groups as db
@@ -75,3 +75,54 @@ def update_group(group_id: int, body: Dict):
         )
 
     return body
+
+
+def select_group_roles(group_id: int) -> List:
+    roles = db.select_group_roles(group_id)
+
+    return roles
+
+
+def insert_group_role(body: Dict):
+    if not body:
+        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+
+    fields = ['group_id', 'role_id']
+
+    if any(field not in body for field in fields):
+        raise HTTPException(
+            "Incorrect body content for adding new group role", HTTPStatus.BAD_REQUEST
+        )
+
+    try:
+        group_role_id = db.insert_group_role(body["group_id"], body["role_id"])
+    except Error:
+        raise HTTPException(
+            "Invalid data for adding new group role", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
+
+    return {"id": group_role_id}
+
+
+def delete_group_role(group_id: Optional[int], role_id: Optional[int]) -> Dict:
+    if group_id is None or role_id is None:
+        raise HTTPException(
+            "No query parameters for deleting group role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    try:
+        response = db.delete_group_role(group_id, role_id)
+    except Error:
+        raise HTTPException(
+            "Invalid query parameters for deleting group role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Delete operation have no effect. Such group role does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return {}
