@@ -40,7 +40,7 @@ def insert_position(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['title', 'level']
+    fields = ["title", "level"]
 
     if any(field not in body for field in fields):
         raise HTTPException(

@@ -46,7 +46,7 @@ def insert_group(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['name', 'description']
+    fields = ["name", "description"]
 
     if any(field not in body for field in fields):
         raise HTTPException(
@@ -93,7 +93,7 @@ def insert_group_role(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['group_id', 'role_id']
+    fields = ["group_id", "role_id"]
 
     if any(field not in body for field in fields):
         raise HTTPException(

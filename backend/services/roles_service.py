@@ -46,7 +46,7 @@ def insert_role(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['name', 'description']
+    fields = ["name", "description"]
 
     if any(field not in body for field in fields):
         raise HTTPException(
@@ -93,7 +93,7 @@ def insert_role_policy(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['role_id', 'policy_id', 'department_id', 'target_user_id']
+    fields = ["role_id", "policy_id", "department_id", "target_user_id"]
 
     if any(field not in body for field in fields):
         raise HTTPException(
@@ -116,7 +116,7 @@ def delete_user_group(body: Dict) -> Dict:
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['role_id', 'policy_id', 'department_id', 'target_user_id']
+    fields = ["role_id", "policy_id", "department_id", "target_user_id"]
 
     if any(field not in body for field in fields):
         raise HTTPException(

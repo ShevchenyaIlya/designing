@@ -40,7 +40,7 @@ def insert_policy(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['title', 'description', 'is_administrative']
+    fields = ["title", "description", "is_administrative"]
 
     if any(field not in body for field in fields):
         raise HTTPException(

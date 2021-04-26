@@ -41,7 +41,7 @@ def user_login(body: Dict) -> Dict:
 
 
 def user_register(body: Dict) -> str:
-    fields = ['first_name', 'last_name', 'middle_name', 'email', 'password']
+    fields = ["first_name", "last_name", "middle_name", "email", "password"]
 
     if any(field not in body for field in fields):
         raise HTTPException("Incorrect body content", HTTPStatus.BAD_REQUEST)
@@ -122,7 +122,7 @@ def insert_user_role(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['user_id', 'role_id']
+    fields = ["user_id", "role_id"]
 
     if any(field not in body for field in fields):
         raise HTTPException(
@@ -173,7 +173,7 @@ def insert_user_group(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['user_id', 'group_id']
+    fields = ["user_id", "group_id"]
 
     if any(field not in body for field in fields):
         raise HTTPException(

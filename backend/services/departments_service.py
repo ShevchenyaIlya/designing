@@ -40,7 +40,7 @@ def insert_department(body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    fields = ['name', 'description', 'head_id']
+    fields = ["name", "description", "head_id"]
 
     if any(field not in body for field in fields):
         raise HTTPException(
