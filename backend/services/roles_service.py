@@ -4,6 +4,7 @@ from typing import Dict, List
 from http_exception import HTTPException
 from models.role import roles as db
 from psycopg2 import Error
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_roles() -> List:
@@ -43,15 +44,8 @@ def delete_role(role_id: int) -> Dict:
 
 
 def insert_role(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["name", "description"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new role", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["name", "description"])
 
     try:
         role_id = db.insert_role(body)
@@ -69,8 +63,7 @@ def insert_role(body: Dict):
 
 
 def update_role(role_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
     try:
         response = db.update_role(role_id, body)
@@ -96,16 +89,8 @@ def select_role_policies(role_id: int) -> List:
 
 
 def insert_role_policy(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["role_id", "policy_id", "department_id", "target_user_id"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for adding new policy to role",
-            HTTPStatus.BAD_REQUEST,
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["role_id", "policy_id", "department_id"])
 
     try:
         role_policy_id = db.insert_role_policy(body)
@@ -119,16 +104,8 @@ def insert_role_policy(body: Dict):
 
 
 def delete_user_policy(body: Dict) -> Dict:
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["role_id", "policy_id", "department_id", "target_user_id"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for adding new policy to role",
-            HTTPStatus.BAD_REQUEST,
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["role_id", "policy_id", "department_id"])
 
     try:
         response = db.delete_role_policy(body)

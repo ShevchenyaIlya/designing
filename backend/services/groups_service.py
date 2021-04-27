@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from http_exception import HTTPException
 from models.group import groups as db
 from psycopg2 import Error
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_groups() -> List:
@@ -43,15 +44,8 @@ def delete_group(group_id: int) -> Dict:
 
 
 def insert_group(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["name", "description"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new group", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["name", "description"])
 
     try:
         group_id = db.insert_group(body)
@@ -69,8 +63,7 @@ def insert_group(body: Dict):
 
 
 def update_group(group_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
     try:
         response = db.update_group(group_id, body)
@@ -96,15 +89,8 @@ def select_group_roles(group_id: int) -> List:
 
 
 def insert_group_role(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["group_id", "role_id"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for adding new group role", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["group_id", "role_id"])
 
     try:
         group_role_id = db.insert_group_role(body["group_id"], body["role_id"])

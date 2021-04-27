@@ -4,6 +4,7 @@ from typing import Dict, List
 from http_exception import HTTPException
 from models.policy import policies as db
 from psycopg2 import Error
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_policies() -> List:
@@ -37,15 +38,8 @@ def delete_policy(policy_id: int) -> Dict:
 
 
 def insert_policy(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["title", "description", "is_administrative"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new policy", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["title", "description", "is_administrative"])
 
     try:
         policy_id = db.insert_policy(body)
@@ -63,8 +57,7 @@ def insert_policy(body: Dict):
 
 
 def update_policy(policy_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
     response = db.update_policy(policy_id, body)
 

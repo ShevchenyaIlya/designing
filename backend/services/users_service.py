@@ -5,6 +5,7 @@ from flask_jwt_extended import create_access_token
 from http_exception import HTTPException
 from models.user import users as db
 from psycopg2 import Error
+from services.request_validators import check_body_content, check_empty_request_body
 from validators import validate_password
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -41,10 +42,10 @@ def user_login(body: Dict) -> Dict:
 
 
 def user_register(body: Dict) -> str:
-    fields = ["first_name", "last_name", "middle_name", "email", "password"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException("Incorrect body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
+    check_body_content(
+        body, fields=["first_name", "last_name", "middle_name", "email", "password"]
+    )
 
     if validate_password(body["password"]) is None:
         raise HTTPException(
@@ -89,8 +90,7 @@ def delete_user(body: Dict) -> Dict:
 
 
 def update_user(body: Dict) -> Dict:
-    if not body:
-        raise HTTPException("Empty body", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
     if not body.get("email", False):
         raise HTTPException("Body must contain user email", HTTPStatus.BAD_REQUEST)
@@ -125,15 +125,8 @@ def select_user_roles(user_id: int) -> List:
 
 
 def insert_user_role(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["user_id", "role_id"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for adding new user role", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["user_id", "role_id"])
 
     try:
         user_role_id = db.insert_user_role(body["user_id"], body["role_id"])
@@ -176,15 +169,8 @@ def select_user_groups(user_id: int) -> List:
 
 
 def insert_user_group(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["user_id", "group_id"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for adding user to group", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["user_id", "group_id"])
 
     try:
         user_group_id = db.insert_user_group(body["user_id"], body["group_id"])

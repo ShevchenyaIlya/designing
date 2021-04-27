@@ -4,6 +4,7 @@ from typing import Dict, List
 from http_exception import HTTPException
 from models.position import positions as db
 from psycopg2 import Error
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_positions() -> List:
@@ -37,15 +38,8 @@ def delete_position(position_id: int) -> Dict:
 
 
 def insert_position(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["title", "level"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new position", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["title", "level"])
 
     try:
         position_id = db.insert_position(body)
@@ -63,8 +57,7 @@ def insert_position(body: Dict):
 
 
 def update_position(position_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
     response = db.update_position(position_id, body)
 

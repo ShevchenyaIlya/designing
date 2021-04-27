@@ -4,6 +4,7 @@ from typing import Dict, List
 from http_exception import HTTPException
 from models.department import departments as db
 from psycopg2 import Error
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_departments() -> List:
@@ -37,15 +38,8 @@ def delete_department(department_id: int) -> Dict:
 
 
 def insert_department(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
-
-    fields = ["name", "description", "head_id"]
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new department", HTTPStatus.BAD_REQUEST
-        )
+    check_empty_request_body(body)
+    check_body_content(body, fields=["name", "description", "head_id"])
 
     try:
         department_id = db.insert_department(body)
@@ -63,8 +57,7 @@ def insert_department(body: Dict):
 
 
 def update_department(department_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
     try:
         response = db.update_department(department_id, body)

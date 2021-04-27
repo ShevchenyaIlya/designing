@@ -4,7 +4,7 @@ from typing import Any, Tuple
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from services import users_service as service
-from services.content_type_validation import content_type_validation
+from services.request_validators import content_type_validation
 
 users: Blueprint = Blueprint("users", __name__, url_prefix="/api/v1")
 
