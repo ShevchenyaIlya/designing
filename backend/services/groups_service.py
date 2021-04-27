@@ -72,7 +72,13 @@ def update_group(group_id: int, body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    response = db.update_group(group_id, body)
+    try:
+        response = db.update_group(group_id, body)
+    except Error:
+        raise HTTPException(
+            "Group with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(

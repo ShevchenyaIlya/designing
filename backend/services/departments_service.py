@@ -66,7 +66,13 @@ def update_department(department_id: int, body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    response = db.update_department(department_id, body)
+    try:
+        response = db.update_department(department_id, body)
+    except Error:
+        raise HTTPException(
+            "Department with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(

@@ -6,6 +6,4 @@ INNER JOIN role
     ON (role_policy.role_id=role.id)
 INNER JOIN department
     ON (role_policy.department_id=department.id)
-INNER JOIN "user"
-    ON (role_policy.target_user_id="user".id)
 WHERE role_id=%s;

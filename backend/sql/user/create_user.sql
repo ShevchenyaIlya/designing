@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "user"(
     last_name VARCHAR(200) NOT NULL,
     middle_name VARCHAR(200),
     register_date DATE,
-    email VARCHAR(200),
+    email VARCHAR(200) UNIQUE,
     password VARCHAR(256),
     near_manager_id BIGSERIAL REFERENCES "user"(id),
     department_id BIGSERIAL REFERENCES department(id),

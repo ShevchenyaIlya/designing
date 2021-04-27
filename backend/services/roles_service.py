@@ -72,7 +72,13 @@ def update_role(role_id: int, body: Dict):
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 
-    response = db.update_role(role_id, body)
+    try:
+        response = db.update_role(role_id, body)
+    except Error:
+        raise HTTPException(
+            "Role with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(
@@ -112,7 +118,7 @@ def insert_role_policy(body: Dict):
     return {"id": role_policy_id}
 
 
-def delete_user_group(body: Dict) -> Dict:
+def delete_user_policy(body: Dict) -> Dict:
     if not body:
         raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
 

@@ -95,7 +95,13 @@ def update_user(body: Dict) -> Dict:
     if not body.get("email", False):
         raise HTTPException("Body must contain user email", HTTPStatus.BAD_REQUEST)
 
-    response = db.update_user(body)
+    try:
+        response = db.update_user(body)
+    except Error:
+        raise HTTPException(
+            "User with such email already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(
