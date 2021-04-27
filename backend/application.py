@@ -22,6 +22,7 @@ def create_flask_app() -> Flask:
     application = Flask(__name__)
     application.config.from_object(CONFIG)
 
+    # Register blueprints
     application.register_blueprint(auth)
     application.register_blueprint(users)
     application.register_blueprint(departments)
@@ -47,6 +48,10 @@ def handle_invalid_usage(error: HTTPException) -> Response:
 
 @application.after_request
 def after_request(response: Response) -> Response:
+    """
+    CORS signal
+    """
+
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
     response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE")

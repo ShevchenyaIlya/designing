@@ -32,13 +32,14 @@ def load_query(filename: str):
 
 
 def convert_row_to_dictionary(rows: List):
+    """
+    Convert DictRow response from database to 'dict'
+    """
+
     for index, row in enumerate(rows):
         rows[index] = dict(row)
 
     return rows
-
-
-# TODO: Change architecture of postgresql handler, split different tables logic to separate classes
 
 
 class PostgreSQLHandler:
