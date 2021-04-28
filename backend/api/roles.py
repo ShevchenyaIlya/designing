@@ -63,7 +63,7 @@ def set_role_policy() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_user_group(body)), HTTPStatus.OK
+    return jsonify(service.insert_role_policy(body)), HTTPStatus.OK
 
 
 @roles.route("/role-policies", methods=["DELETE"])

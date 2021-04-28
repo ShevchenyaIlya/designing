@@ -90,12 +90,7 @@ class RoleModel(PostgreSQLHandler):
     def insert_role_policy(self, body: Dict):
         self.cursor.execute(
             self.get_query("role_policy", "insert_role_policy"),
-            (
-                body["role_id"],
-                body["policy_id"],
-                body["department_id"],
-                body["target_user_id"],
-            ),
+            (body["role_id"], body["policy_id"], body["department_id"]),
         )
         self.connection.commit()
 
@@ -104,12 +99,7 @@ class RoleModel(PostgreSQLHandler):
     def delete_role_policy(self, body: Dict):
         self.cursor.execute(
             self.get_query("role_policy", "delete_user_group"),
-            (
-                body["role_id"],
-                body["policy_id"],
-                body["department_id"],
-                body["target_user_id"],
-            ),
+            (body["role_id"], body["policy_id"], body["department_id"]),
         )
         self.connection.commit()
 
