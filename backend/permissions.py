@@ -7,10 +7,15 @@ from models.user import users as db
 
 
 def permissions(permission_action: str) -> Callable:
-    """"""
+    """
+    Decorator wrapper definition
+    permission_action - equivalent for policy title
+    """
 
     def required_permissions(endpoint_handler: Callable) -> Callable:
-        """"""
+        """
+        Decorator definition
+        """
 
         @wraps(endpoint_handler)
         def wrapper(*args, **kwargs):
@@ -18,7 +23,7 @@ def permissions(permission_action: str) -> Callable:
             user_identity = get_jwt_identity()
             policies = db.select_user_policies(user_identity["id"])
 
-            if not have_permissions(permission_action, policies):
+            if not has_permissions(permission_action, policies):
                 raise HTTPException(
                     "You have no permissions for execute such operation", 403
                 )
@@ -30,7 +35,7 @@ def permissions(permission_action: str) -> Callable:
     return required_permissions
 
 
-def have_permissions(permission_title: str, permission_list: List):
+def has_permissions(permission_title: str, permission_list: List):
     required_permissions = filter(
         lambda a: a["title"] == permission_title, permission_list
     )
