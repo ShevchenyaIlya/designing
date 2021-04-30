@@ -1,9 +1,9 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+from enums import TransactionResult
 from http_exception import HTTPException
 from models.department import departments as db
-from psycopg2 import Error
 from services.request_validators import check_body_content, check_empty_request_body
 
 
@@ -41,14 +41,12 @@ def insert_department(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["name", "description", "head_id"])
 
-    try:
-        department_id = db.insert_department(body)
-    except Error:
+    if (department_id := db.insert_department(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new department", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not department_id:
+    if department_id == TransactionResult.SUCCESS:
         raise HTTPException(
             "Department exist or something went wrong", HTTPStatus.FORBIDDEN
         )
@@ -59,9 +57,7 @@ def insert_department(body: Dict):
 def update_department(department_id: int, body: Dict):
     check_empty_request_body(body)
 
-    try:
-        response = db.update_department(department_id, body)
-    except Error:
+    if (response := db.update_department(department_id, body)) is None:
         raise HTTPException(
             "Department with such name already exist. You can't execute update operation with this data.",
             HTTPStatus.UNPROCESSABLE_ENTITY,

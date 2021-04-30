@@ -1,9 +1,9 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+from enums import TransactionResult
 from http_exception import HTTPException
 from models.unit import units as db
-from psycopg2 import Error
 from services.request_validators import check_body_content, check_empty_request_body
 
 
@@ -51,14 +51,12 @@ def insert_unit(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["name", "description", "department_id", "head_id"])
 
-    try:
-        unit_id = db.insert_unit(body)
-    except Error:
+    if (unit_id := db.insert_unit(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new department", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not unit_id:
+    if unit_id == TransactionResult.SUCCESS:
         raise HTTPException("Unit exist or something went wrong", HTTPStatus.FORBIDDEN)
 
     return {"id": unit_id}
@@ -67,7 +65,11 @@ def insert_unit(body: Dict):
 def update_unit(unit_id: int, body: Dict):
     check_empty_request_body(body)
 
-    response = db.update_unit(unit_id, body)
+    if (response := db.update_unit(unit_id, body)) is None:
+        raise HTTPException(
+            "Unit with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(

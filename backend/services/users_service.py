@@ -1,10 +1,10 @@
 from http import HTTPStatus
 from typing import Dict, List, Optional
 
+from enums import TransactionResult
 from flask_jwt_extended import create_access_token
 from http_exception import HTTPException
 from models.user import users as db
-from psycopg2 import Error
 from services.request_validators import check_body_content, check_empty_request_body
 from validators import validate_password
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -41,7 +41,7 @@ def user_login(body: Dict) -> Dict:
     }
 
 
-def user_register(body: Dict) -> str:
+def user_register(body: Dict) -> Dict:
     check_empty_request_body(body)
     check_body_content(
         body, fields=["first_name", "last_name", "middle_name", "email", "password"]
@@ -55,14 +55,19 @@ def user_register(body: Dict) -> str:
         )
 
     body["password"] = generate_password_hash(body["password"])
-    user_id = db.insert_user(body)
 
-    if not user_id:
+    if (user_id := db.insert_user(body)) == TransactionResult.ERROR:
         raise HTTPException(
-            "User exist or reached company members limit", HTTPStatus.FORBIDDEN
+            "Invalid data for creating register new user",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
-    return user_id
+    if user_id == TransactionResult.SUCCESS:
+        raise HTTPException(
+            "User already exist. Operation can not be executed", HTTPStatus.FORBIDDEN
+        )
+
+    return {"id": user_id}
 
 
 def user_profile(user_identity: Dict) -> Dict:
@@ -95,9 +100,7 @@ def update_user(body: Dict) -> Dict:
     if not body.get("email", False):
         raise HTTPException("Body must contain user email", HTTPStatus.BAD_REQUEST)
 
-    try:
-        response = db.update_user(body)
-    except Error:
+    if (response := db.update_user(body)) is None:
         raise HTTPException(
             "User with such email already exist. You can't execute update operation with this data.",
             HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -128,9 +131,7 @@ def insert_user_role(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["user_id", "role_id"])
 
-    try:
-        user_role_id = db.insert_user_role(body["user_id"], body["role_id"])
-    except Error:
+    if (user_role_id := db.insert_user_role(body["user_id"], body["role_id"])) is None:
         raise HTTPException(
             "Invalid data for adding new user role", HTTPStatus.UNPROCESSABLE_ENTITY
         )
@@ -145,9 +146,7 @@ def delete_user_role(user_id: Optional[int], role_id: Optional[int]) -> Dict:
             HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
-    try:
-        response = db.delete_user_role(user_id, role_id)
-    except Error:
+    if (response := db.delete_user_role(user_id, role_id)) is None:
         raise HTTPException(
             "Invalid query parameters for deleting user role",
             HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -172,9 +171,9 @@ def insert_user_group(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["user_id", "group_id"])
 
-    try:
-        user_group_id = db.insert_user_group(body["user_id"], body["group_id"])
-    except Error:
+    if (
+        user_group_id := db.insert_user_group(body["user_id"], body["group_id"])
+    ) is None:
         raise HTTPException(
             "Invalid data for adding user to group", HTTPStatus.UNPROCESSABLE_ENTITY
         )
@@ -189,9 +188,7 @@ def delete_user_group(user_id: Optional[int], group_id: Optional[int]) -> Dict:
             HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
-    try:
-        response = db.delete_user_group(user_id, group_id)
-    except Error:
+    if (response := db.delete_user_group(user_id, group_id)) is None:
         raise HTTPException(
             "Invalid query parameters for deleting user group",
             HTTPStatus.UNPROCESSABLE_ENTITY,

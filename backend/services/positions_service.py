@@ -1,9 +1,9 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+from enums import TransactionResult
 from http_exception import HTTPException
 from models.position import positions as db
-from psycopg2 import Error
 from services.request_validators import check_body_content, check_empty_request_body
 
 
@@ -41,14 +41,12 @@ def insert_position(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["title", "level"])
 
-    try:
-        position_id = db.insert_position(body)
-    except Error:
+    if (position_id := db.insert_position(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new position", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not position_id:
+    if position_id == TransactionResult.SUCCESS:
         raise HTTPException(
             "Position already exist or something went wrong", HTTPStatus.FORBIDDEN
         )
@@ -59,7 +57,11 @@ def insert_position(body: Dict):
 def update_position(position_id: int, body: Dict):
     check_empty_request_body(body)
 
-    response = db.update_position(position_id, body)
+    if (response := db.update_position(position_id, body)) is None:
+        raise HTTPException(
+            "Position with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(

@@ -4,7 +4,6 @@ from typing import Dict, List
 from enums import TransactionResult
 from http_exception import HTTPException
 from models.role import roles as db
-from psycopg2 import Error
 from services.request_validators import check_body_content, check_empty_request_body
 
 
