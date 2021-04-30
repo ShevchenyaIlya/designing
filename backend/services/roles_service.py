@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+from enums import TransactionResult
 from http_exception import HTTPException
 from models.role import roles as db
 from psycopg2 import Error
@@ -47,14 +48,12 @@ def insert_role(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["name", "description"])
 
-    try:
-        role_id = db.insert_role(body)
-    except Error:
+    if (role_id := db.insert_role(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new role", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not role_id:
+    if role_id == TransactionResult.SUCCESS:
         raise HTTPException(
             "Role already exist or something went wrong", HTTPStatus.FORBIDDEN
         )
@@ -65,9 +64,7 @@ def insert_role(body: Dict):
 def update_role(role_id: int, body: Dict):
     check_empty_request_body(body)
 
-    try:
-        response = db.update_role(role_id, body)
-    except Error:
+    if (response := db.update_role(role_id, body)) is None:
         raise HTTPException(
             "Role with such name already exist. You can't execute update operation with this data.",
             HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -92,9 +89,7 @@ def insert_role_policy(body: Dict):
     check_empty_request_body(body)
     check_body_content(body, fields=["role_id", "policy_id", "department_id"])
 
-    try:
-        role_policy_id = db.insert_role_policy(body)
-    except Error:
+    if (role_policy_id := db.insert_role_policy(body)) is None:
         raise HTTPException(
             "Invalid data for adding new policy to role",
             HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -107,9 +102,7 @@ def delete_user_policy(body: Dict) -> Dict:
     check_empty_request_body(body)
     check_body_content(body, fields=["role_id", "policy_id", "department_id"])
 
-    try:
-        response = db.delete_role_policy(body)
-    except Error:
+    if (response := db.delete_role_policy(body)) is None:
         raise HTTPException(
             "Invalid query parameters for deleting role policy",
             HTTPStatus.UNPROCESSABLE_ENTITY,
