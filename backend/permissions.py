@@ -1,12 +1,13 @@
 from functools import wraps
 from typing import Callable, List
 
+from enums import Permission
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from http_exception import HTTPException
 from models.user import users as db
 
 
-def permissions(permission_action: str) -> Callable:
+def permissions(permission_action: Permission) -> Callable:
     """
     Decorator wrapper definition
     permission_action - equivalent for policy title
@@ -23,12 +24,12 @@ def permissions(permission_action: str) -> Callable:
             user_identity = get_jwt_identity()
             policies = db.select_user_policies(user_identity["id"])
 
-            if not has_permissions(permission_action, policies):
+            if not has_permissions(permission_action.value, policies):
                 raise HTTPException(
                     "You have no permissions for execute such operation", 403
                 )
 
-            endpoint_handler(*args, **kwargs)
+            return endpoint_handler(*args, **kwargs)
 
         return wrapper
 

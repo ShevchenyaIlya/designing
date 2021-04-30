@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import Any, Tuple
 
+from enums import Permission
 from flask import Blueprint, Response, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from permissions import permissions
@@ -19,7 +20,7 @@ def login() -> Tuple[Any, int]:
 
 
 @auth.route("/register", methods=["POST"])
-@permissions("Create users")
+@permissions(Permission.CREATE_USERS)
 def register() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
