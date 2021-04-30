@@ -1,4 +1,7 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
+
+from enums import TransactionResult
+from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
 
@@ -25,55 +28,69 @@ class GroupModel(PostgreSQLHandler):
 
         return bool(self.cursor.rowcount)
 
-    def insert_group(self, group: Dict) -> int:
+    def insert_group(self, group: Dict) -> Union[int, TransactionResult]:
         if not self.group_exists(group["name"]):
+            try:
+                self.cursor.execute(
+                    self.get_query("group", "insert_group"),
+                    (
+                        group["name"],
+                        group["description"],
+                    ),
+                )
+            except Error:
+                self.connection.rollback()
+                return TransactionResult.ERROR
+            else:
+                self.connection.commit()
+                return self.cursor.fetchone()[0]
+
+        return TransactionResult.SUCCESS
+
+    def update_group(self, group_id: int, group: Dict) -> Optional[bool]:
+        try:
             self.cursor.execute(
-                self.get_query("group", "insert_group"),
+                self.get_query("group", "update_group"),
                 (
-                    group["name"],
-                    group["description"],
+                    group.get("name", None),
+                    group.get("description", None),
+                    group_id,
                 ),
             )
+        except Error:
+            self.connection.rollback()
+        else:
             self.connection.commit()
-
-            return self.cursor.fetchone()[0]
-
-    def update_group(self, group_id: int, group: Dict) -> bool:
-        self.cursor.execute(
-            self.get_query("group", "update_group"),
-            (
-                group.get("name", None),
-                group.get("description", None),
-                group_id,
-            ),
-        )
-
-        self.connection.commit()
-
-        return bool(self.cursor.rowcount)
+            return bool(self.cursor.rowcount)
 
     def group_exists(self, name: str) -> bool:
         self.cursor.execute(self.get_query("group", "group_exists"), (name,))
         return self.cursor.fetchall()[0][0]
 
-    def insert_group_role(self, group_id: int, role_id: int):
-        self.cursor.execute(
-            self.get_query("group_role", "insert_group_role"),
-            (group_id, role_id),
-        )
-        self.connection.commit()
+    def insert_group_role(self, group_id: int, role_id: int) -> Optional[bool]:
+        try:
+            self.cursor.execute(
+                self.get_query("group_role", "insert_group_role"),
+                (group_id, role_id),
+            )
+        except Error:
+            self.connection.rollback()
+        else:
+            self.connection.commit()
+            return self.cursor.fetchone()[0]
 
-        return self.cursor.fetchone()[0]
+    def delete_group_role(self, group_id: int, role_id: int) -> Optional[bool]:
+        try:
+            self.cursor.execute(
+                self.get_query("group_role", "delete_group_role"), (group_id, role_id)
+            )
+        except Error:
+            self.connection.rollback()
+        else:
+            self.connection.commit()
+            return bool(self.cursor.rowcount)
 
-    def delete_group_role(self, group_id: int, role_id: int):
-        self.cursor.execute(
-            self.get_query("group_role", "delete_group_role"), (group_id, role_id)
-        )
-        self.connection.commit()
-
-        return bool(self.cursor.rowcount)
-
-    def select_group_roles(self, group_id: int):
+    def select_group_roles(self, group_id: int) -> List[Dict]:
         self.cursor.execute(
             self.get_query("group_role", "select_group_roles"), (group_id,)
         )
@@ -84,7 +101,7 @@ class GroupModel(PostgreSQLHandler):
 
         return roles
 
-    def select_users_in_group(self, group_id: int):
+    def select_users_in_group(self, group_id: int) -> List[Dict]:
         self.cursor.execute(
             self.get_query("user_group", "select_users_in_group"), (group_id,)
         )

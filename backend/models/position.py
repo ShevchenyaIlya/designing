@@ -1,4 +1,7 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Union
+
+from enums import TransactionResult
+from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
 
@@ -29,32 +32,40 @@ class PositionModel(PostgreSQLHandler):
 
         return bool(self.cursor.rowcount)
 
-    def insert_position(self, position: Dict) -> int:
+    def insert_position(self, position: Dict) -> Union[int, TransactionResult]:
         if not self.position_exists(position["title"]):
+            try:
+                self.cursor.execute(
+                    self.get_query("position", "insert_position"),
+                    (
+                        position["title"],
+                        position["level"],
+                    ),
+                )
+            except Error:
+                self.connection.rollback()
+                return TransactionResult.ERROR
+            else:
+                self.connection.commit()
+                return self.cursor.fetchone()[0]
+
+        return TransactionResult.SUCCESS
+
+    def update_position(self, position_id: int, position: Dict) -> Optional[bool]:
+        try:
             self.cursor.execute(
-                self.get_query("position", "insert_position"),
+                self.get_query("position", "update_position"),
                 (
-                    position["title"],
-                    position["level"],
+                    position.get("name", None),
+                    position.get("description", None),
+                    position_id,
                 ),
             )
+        except Error:
+            self.connection.rollback()
+        else:
             self.connection.commit()
-
-            return self.cursor.fetchone()[0]
-
-    def update_position(self, position_id: int, position: Dict) -> bool:
-        self.cursor.execute(
-            self.get_query("position", "update_position"),
-            (
-                position.get("name", None),
-                position.get("description", None),
-                position_id,
-            ),
-        )
-
-        self.connection.commit()
-
-        return bool(self.cursor.rowcount)
+            return bool(self.cursor.rowcount)
 
     def position_exists(self, name: str) -> bool:
         self.cursor.execute(self.get_query("position", "position_exists"), (name,))
