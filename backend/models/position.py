@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, List, Optional, Union
 
 from enums import TransactionResult
 from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
+
+LOG = logging.getLogger(__name__)
 
 
 class PositionModel(PostgreSQLHandler):
@@ -42,7 +45,9 @@ class PositionModel(PostgreSQLHandler):
                         position["level"],
                     ),
                 )
-            except Error:
+            except Error as error:
+                LOG.debug(error)
+
                 self.connection.rollback()
                 return TransactionResult.ERROR
             else:
@@ -61,7 +66,8 @@ class PositionModel(PostgreSQLHandler):
                     position_id,
                 ),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()

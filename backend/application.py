@@ -1,3 +1,4 @@
+import logging
 import os
 
 from api.auth import auth
@@ -14,6 +15,11 @@ from flask_jwt_extended import JWTManager
 from http_exception import HTTPException
 
 
+def configure_logging():
+    logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger("werkzeug").setLevel(logging.INFO)
+
+
 def create_flask_app() -> Flask:
     """
     Factory for creating flask application instance
@@ -21,6 +27,7 @@ def create_flask_app() -> Flask:
 
     application = Flask(__name__)
     application.config.from_object(CONFIG)
+    configure_logging()
 
     # Register blueprints
     application.register_blueprint(auth)

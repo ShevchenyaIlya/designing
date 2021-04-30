@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 
 from enums import TransactionResult
 from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler
+
+LOG = logging.getLogger(__name__)
 
 
 class UserModel(PostgreSQLHandler):
@@ -24,7 +27,9 @@ class UserModel(PostgreSQLHandler):
                         user["password"],
                     ),
                 )
-            except Error:
+            except Error as error:
+                LOG.debug(error)
+
                 self.connection.rollback()
                 return TransactionResult.ERROR
             else:
@@ -70,7 +75,8 @@ class UserModel(PostgreSQLHandler):
                     user["email"],
                 ),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -91,7 +97,8 @@ class UserModel(PostgreSQLHandler):
                 self.get_query("user_role", "insert_user_role"),
                 (user_id, role_id),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -102,7 +109,8 @@ class UserModel(PostgreSQLHandler):
             self.cursor.execute(
                 self.get_query("user_role", "delete_user_role"), (user_id, role_id)
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -125,7 +133,8 @@ class UserModel(PostgreSQLHandler):
                 self.get_query("user_group", "insert_user_group"),
                 (group_id, user_id),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -136,7 +145,8 @@ class UserModel(PostgreSQLHandler):
             self.cursor.execute(
                 self.get_query("user_group", "delete_user_group"), (user_id, group_id)
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()

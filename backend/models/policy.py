@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, List, Optional, Union
 
 from enums import TransactionResult
 from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
+
+LOG = logging.getLogger(__name__)
 
 
 class PolicyModel(PostgreSQLHandler):
@@ -41,7 +44,9 @@ class PolicyModel(PostgreSQLHandler):
                         policy["is_administrative"],
                     ),
                 )
-            except Error:
+            except Error as error:
+                LOG.debug(error)
+
                 self.connection.rollback()
                 return TransactionResult.ERROR
             else:
@@ -61,7 +66,8 @@ class PolicyModel(PostgreSQLHandler):
                     policy_id,
                 ),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()

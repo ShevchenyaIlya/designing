@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 
 from enums import TransactionResult
 from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
+
+LOG = logging.getLogger(__name__)
 
 
 class UnitModel(PostgreSQLHandler):
@@ -48,7 +51,9 @@ class UnitModel(PostgreSQLHandler):
                         unit["head_id"],
                     ),
                 )
-            except Error:
+            except Error as error:
+                LOG.debug(error)
+
                 self.connection.rollback()
                 return TransactionResult.ERROR
             else:
@@ -69,7 +74,8 @@ class UnitModel(PostgreSQLHandler):
                     unit_id,
                 ),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()

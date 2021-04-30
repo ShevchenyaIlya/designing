@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 
 from enums import TransactionResult
 from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
+
+LOG = logging.getLogger(__name__)
 
 
 class GroupModel(PostgreSQLHandler):
@@ -38,7 +41,9 @@ class GroupModel(PostgreSQLHandler):
                         group["description"],
                     ),
                 )
-            except Error:
+            except Error as error:
+                LOG.debug(error)
+
                 self.connection.rollback()
                 return TransactionResult.ERROR
             else:
@@ -57,7 +62,8 @@ class GroupModel(PostgreSQLHandler):
                     group_id,
                 ),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -73,7 +79,8 @@ class GroupModel(PostgreSQLHandler):
                 self.get_query("group_role", "insert_group_role"),
                 (group_id, role_id),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -84,7 +91,8 @@ class GroupModel(PostgreSQLHandler):
             self.cursor.execute(
                 self.get_query("group_role", "delete_group_role"), (group_id, role_id)
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()

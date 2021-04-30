@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 
 from enums import TransactionResult
 from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
+
+LOG = logging.getLogger(__name__)
 
 
 class RoleModel(PostgreSQLHandler):
@@ -69,7 +72,9 @@ class RoleModel(PostgreSQLHandler):
                         role["description"],
                     ),
                 )
-            except Error:
+            except Error as error:
+                LOG.debug(error)
+
                 self.connection.rollback()
                 return TransactionResult.ERROR
             else:
@@ -88,7 +93,8 @@ class RoleModel(PostgreSQLHandler):
                     role_id,
                 ),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -104,7 +110,8 @@ class RoleModel(PostgreSQLHandler):
                 self.get_query("role_policy", "insert_role_policy"),
                 (body["role_id"], body["policy_id"], body["department_id"]),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
@@ -116,7 +123,8 @@ class RoleModel(PostgreSQLHandler):
                 self.get_query("role_policy", "delete_user_group"),
                 (body["role_id"], body["policy_id"], body["department_id"]),
             )
-        except Error:
+        except Error as error:
+            LOG.debug(error)
             self.connection.rollback()
         else:
             self.connection.commit()
