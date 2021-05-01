@@ -1,15 +1,5 @@
 import logging
-import os
 
-from api.auth import auth
-from api.departments import departments
-from api.documentation import auto, doc
-from api.groups import groups
-from api.policies import policies
-from api.positions import positions
-from api.roles import roles
-from api.units import units
-from api.users import users
 from config import CONFIG
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
@@ -31,18 +21,48 @@ def create_flask_app() -> Flask:
     application.config.from_object(CONFIG)
     configure_logging()
 
-    auto.init_app(application)
+    version = application.config["APPLICATION_VERSION"]
+
+    for module in [
+        "documentation",
+        "auth",
+        "departments",
+        "groups",
+        "policies",
+        "positions",
+        "roles",
+        "units",
+        "users",
+    ]:
+        api = __import__(f"api.{version}.{module}")
+
+    api_version = getattr(api, version)
+    api_version.documentation.auto.init_app(application)
 
     # Register blueprints
-    application.register_blueprint(auth)
-    application.register_blueprint(users)
-    application.register_blueprint(departments)
-    application.register_blueprint(units)
-    application.register_blueprint(groups)
-    application.register_blueprint(roles)
-    application.register_blueprint(positions)
-    application.register_blueprint(policies)
-    application.register_blueprint(doc)
+    application.register_blueprint(api_version.auth.auth)
+    application.register_blueprint(
+        api_version.users.users, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(
+        api_version.departments.departments, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(
+        api_version.units.units, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(
+        api_version.groups.groups, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(
+        api_version.roles.roles, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(
+        api_version.positions.positions, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(
+        api_version.policies.policies, url_prefix=f"/api/{version}"
+    )
+    application.register_blueprint(api_version.documentation.doc)
 
     return application
 

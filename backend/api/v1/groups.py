@@ -10,7 +10,7 @@ from services.request_validators import content_type_validation
 
 from .documentation import auto
 
-groups: Blueprint = Blueprint("groups", __name__, url_prefix="/api/v1")
+groups: Blueprint = Blueprint("groups", __name__)
 
 
 @groups.route("/groups", methods=["GET"])
