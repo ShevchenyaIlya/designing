@@ -1,5 +1,5 @@
 INSERT INTO user_role(
-    role_id,
+    user_id,
     role_id
 ) VALUES (%s, %s)
 RETURNING id;

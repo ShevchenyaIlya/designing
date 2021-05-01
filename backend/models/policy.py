@@ -1,6 +1,12 @@
-from typing import Dict, List, Optional, Tuple
+import logging
+from typing import Dict, List, Optional, Union
+
+from enums import TransactionResult
+from psycopg2 import Error
 
 from .postgresql_handler import PostgreSQLHandler, convert_row_to_dictionary
+
+LOG = logging.getLogger(__name__)
 
 
 class PolicyModel(PostgreSQLHandler):
@@ -27,34 +33,45 @@ class PolicyModel(PostgreSQLHandler):
 
         return bool(self.cursor.rowcount)
 
-    def insert_policy(self, policy: Dict) -> int:
+    def insert_policy(self, policy: Dict) -> Union[int, TransactionResult]:
         if not self.policy_exists(policy["title"]):
+            try:
+                self.cursor.execute(
+                    self.get_query("policy", "insert_policy"),
+                    (
+                        policy["title"],
+                        policy["description"],
+                        policy["is_administrative"],
+                    ),
+                )
+            except Error as error:
+                LOG.debug(error)
+
+                self.connection.rollback()
+                return TransactionResult.ERROR
+            else:
+                self.connection.commit()
+                return self.cursor.fetchone()[0]
+
+        return TransactionResult.SUCCESS
+
+    def update_policy(self, policy_id: int, policy: Dict) -> Optional[bool]:
+        try:
             self.cursor.execute(
-                self.get_query("policy", "insert_policy"),
+                self.get_query("policy", "update_policy"),
                 (
-                    policy["title"],
-                    policy["description"],
-                    policy["is_administrative"],
+                    policy.get("title", None),
+                    policy.get("description", None),
+                    policy.get("is_administrative", None),
+                    policy_id,
                 ),
             )
+        except Error as error:
+            LOG.debug(error)
+            self.connection.rollback()
+        else:
             self.connection.commit()
-
-            return self.cursor.fetchone()[0]
-
-    def update_policy(self, policy_id: int, policy: Dict) -> bool:
-        self.cursor.execute(
-            self.get_query("policy", "update_policy"),
-            (
-                policy.get("title", None),
-                policy.get("description", None),
-                policy.get("is_administrative", None),
-                policy_id,
-            ),
-        )
-
-        self.connection.commit()
-
-        return bool(self.cursor.rowcount)
+            return bool(self.cursor.rowcount)
 
     def policy_exists(self, name: str) -> bool:
         self.cursor.execute(self.get_query("policy", "policy_exists"), (name,))

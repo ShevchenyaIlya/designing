@@ -1,1 +1,1 @@
-SELECT name, description FROM group;
+SELECT * FROM "group";

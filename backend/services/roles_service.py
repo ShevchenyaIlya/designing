@@ -1,15 +1,22 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+from enums import TransactionResult
 from http_exception import HTTPException
-from models.roles import roles as db
-from psycopg2 import Error
+from models.role import roles as db
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_roles() -> List:
     roles = db.select_roles()
 
     return roles
+
+
+def select_users_with_role(role_id: int) -> List:
+    users = db.select_users_with_role(role_id)
+
+    return users
 
 
 def select_single_role(role_id: int):
@@ -37,24 +44,15 @@ def delete_role(role_id: int) -> Dict:
 
 
 def insert_role(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
+    check_body_content(body, fields=["name", "description"])
 
-    fields = ['name', 'description']
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new role", HTTPStatus.BAD_REQUEST
-        )
-
-    try:
-        role_id = db.insert_role(body)
-    except Error:
+    if (role_id := db.insert_role(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new role", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not role_id:
+    if role_id == TransactionResult.SUCCESS:
         raise HTTPException(
             "Role already exist or something went wrong", HTTPStatus.FORBIDDEN
         )
@@ -63,10 +61,13 @@ def insert_role(body: Dict):
 
 
 def update_role(role_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
-    response = db.update_role(role_id, body)
+    if (response := db.update_role(role_id, body)) is None:
+        raise HTTPException(
+            "Role with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(
@@ -75,3 +76,41 @@ def update_role(role_id: int, body: Dict):
         )
 
     return body
+
+
+def select_role_policies(role_id: int) -> List:
+    policies = db.select_role_policies(role_id)
+
+    return policies
+
+
+def insert_role_policy(body: Dict):
+    check_empty_request_body(body)
+    check_body_content(body, fields=["role_id", "policy_id", "department_id"])
+
+    if (role_policy_id := db.insert_role_policy(body)) is None:
+        raise HTTPException(
+            "Invalid data for adding new policy to role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    return {"id": role_policy_id}
+
+
+def delete_user_policy(body: Dict) -> Dict:
+    check_empty_request_body(body)
+    check_body_content(body, fields=["role_id", "policy_id", "department_id"])
+
+    if (response := db.delete_role_policy(body)) is None:
+        raise HTTPException(
+            "Invalid query parameters for deleting role policy",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Delete operation have no effect. Such role policy does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return {}

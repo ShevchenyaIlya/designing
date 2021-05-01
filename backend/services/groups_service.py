@@ -1,15 +1,22 @@
 from http import HTTPStatus
-from typing import Dict, List
+from typing import Dict, List, Optional
 
+from enums import TransactionResult
 from http_exception import HTTPException
-from models.groups import groups as db
-from psycopg2 import Error
+from models.group import groups as db
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_groups() -> List:
     groups = db.select_groups()
 
     return groups
+
+
+def select_users_in_group(group_id: int) -> List:
+    users = db.select_users_in_group(group_id)
+
+    return users
 
 
 def select_single_group(group_id: int):
@@ -37,24 +44,15 @@ def delete_group(group_id: int) -> Dict:
 
 
 def insert_group(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
+    check_body_content(body, fields=["name", "description"])
 
-    fields = ['name', 'description']
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new group", HTTPStatus.BAD_REQUEST
-        )
-
-    try:
-        group_id = db.insert_group(body)
-    except Error:
+    if (group_id := db.insert_group(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new group", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not group_id:
+    if group_id == TransactionResult.SUCCESS:
         raise HTTPException(
             "Group already exist or something went wrong", HTTPStatus.FORBIDDEN
         )
@@ -63,10 +61,13 @@ def insert_group(body: Dict):
 
 
 def update_group(group_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
-    response = db.update_group(group_id, body)
+    if (response := db.update_group(group_id, body)) is None:
+        raise HTTPException(
+            "Group with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(
@@ -75,3 +76,45 @@ def update_group(group_id: int, body: Dict):
         )
 
     return body
+
+
+def select_group_roles(group_id: int) -> List:
+    roles = db.select_group_roles(group_id)
+
+    return roles
+
+
+def insert_group_role(body: Dict):
+    check_empty_request_body(body)
+    check_body_content(body, fields=["group_id", "role_id"])
+
+    if (
+        group_role_id := db.insert_group_role(body["group_id"], body["role_id"])
+    ) is None:
+        raise HTTPException(
+            "Invalid data for adding new group role", HTTPStatus.UNPROCESSABLE_ENTITY
+        )
+
+    return {"id": group_role_id}
+
+
+def delete_group_role(group_id: Optional[int], role_id: Optional[int]) -> Dict:
+    if group_id is None or role_id is None:
+        raise HTTPException(
+            "No query parameters for deleting group role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if (response := db.delete_group_role(group_id, role_id)) is None:
+        raise HTTPException(
+            "Invalid query parameters for deleting group role",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Delete operation have no effect. Such group role does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return {}

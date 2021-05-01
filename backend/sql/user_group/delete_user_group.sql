@@ -1,2 +1,2 @@
 DELETE FROM user_group
-WHERE id=%s;
+WHERE user_id=%s AND group_id=%s;

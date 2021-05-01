@@ -1,13 +1,23 @@
+import logging
 import os
 
 from api.auth import auth
 from api.departments import departments
+from api.groups import groups
+from api.policies import policies
+from api.positions import positions
+from api.roles import roles
 from api.units import units
 from api.users import users
 from config import CONFIG
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
 from http_exception import HTTPException
+
+
+def configure_logging():
+    logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger("werkzeug").setLevel(logging.INFO)
 
 
 def create_flask_app() -> Flask:
@@ -17,11 +27,17 @@ def create_flask_app() -> Flask:
 
     application = Flask(__name__)
     application.config.from_object(CONFIG)
+    configure_logging()
 
+    # Register blueprints
     application.register_blueprint(auth)
     application.register_blueprint(users)
     application.register_blueprint(departments)
     application.register_blueprint(units)
+    application.register_blueprint(groups)
+    application.register_blueprint(roles)
+    application.register_blueprint(positions)
+    application.register_blueprint(policies)
 
     return application
 
@@ -39,9 +55,13 @@ def handle_invalid_usage(error: HTTPException) -> Response:
 
 @application.after_request
 def after_request(response: Response) -> Response:
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    """
+    CORS signal
+    """
+
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE")
 
     return response
 

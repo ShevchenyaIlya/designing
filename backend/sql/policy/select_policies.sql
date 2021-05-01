@@ -1,1 +1,1 @@
-SELECT title, description, is_administrative FROM policy;
+SELECT id, title, description, is_administrative FROM policy;

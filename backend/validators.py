@@ -26,6 +26,10 @@ def validate_password(password):
 
 
 def validate_content_type(content_type: str) -> bool:
+    """
+    Check if request body content type is 'application/json'
+    """
+
     if content_type == "application/json":
         return True
 

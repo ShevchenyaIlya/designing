@@ -22,6 +22,7 @@ sudo -u postgres psql designing -f backend/sql/user/create_user.sql
 sudo -u postgres psql designing -f backend/sql/user_group/create_user_group.sql
 sudo -u postgres psql designing -f backend/sql/user_role/create_user_role.sql
 sudo -u postgres psql designing -f backend/sql/group_role/create_group_role.sql
+sudo -u postgres psql designing -f backend/sql/role_policy/create_role_policy.sql
 
 # Trigger
 sudo -u postgres psql designing -f backend/sql/user/create_user_audit.sql

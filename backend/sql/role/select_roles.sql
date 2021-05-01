@@ -1,1 +1,1 @@
-SELECT name, description FROM role;
+SELECT id, name, description FROM role;

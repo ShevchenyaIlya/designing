@@ -1,9 +1,10 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+from enums import TransactionResult
 from http_exception import HTTPException
-from models.policies import policies as db
-from psycopg2 import Error
+from models.policy import policies as db
+from services.request_validators import check_body_content, check_empty_request_body
 
 
 def select_policies() -> List:
@@ -37,24 +38,15 @@ def delete_policy(policy_id: int) -> Dict:
 
 
 def insert_policy(body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
+    check_body_content(body, fields=["title", "description", "is_administrative"])
 
-    fields = ['title', 'description', 'is_administrative']
-
-    if any(field not in body for field in fields):
-        raise HTTPException(
-            "Incorrect body content for creating new policy", HTTPStatus.BAD_REQUEST
-        )
-
-    try:
-        policy_id = db.insert_policy(body)
-    except Error:
+    if (policy_id := db.insert_policy(body)) == TransactionResult.ERROR:
         raise HTTPException(
             "Invalid data for creating new policy", HTTPStatus.UNPROCESSABLE_ENTITY
         )
 
-    if not policy_id:
+    if policy_id == TransactionResult.SUCCESS:
         raise HTTPException(
             "Policy already exist or something went wrong", HTTPStatus.FORBIDDEN
         )
@@ -63,10 +55,13 @@ def insert_policy(body: Dict):
 
 
 def update_policy(policy_id: int, body: Dict):
-    if not body:
-        raise HTTPException("Empty body content", HTTPStatus.BAD_REQUEST)
+    check_empty_request_body(body)
 
-    response = db.update_policy(policy_id, body)
+    if (response := db.update_policy(policy_id, body)) is None:
+        raise HTTPException(
+            "Policy with such name already exist. You can't execute update operation with this data.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
     if not response:
         raise HTTPException(

@@ -20,5 +20,5 @@ class HTTPException(Exception):
 
     def to_dict(self) -> Dict:
         rv = dict(self.payload or ())
-        rv['message'] = self.message
+        rv["message"] = self.message
         return rv
