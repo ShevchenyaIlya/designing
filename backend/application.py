@@ -3,6 +3,7 @@ import os
 
 from api.auth import auth
 from api.departments import departments
+from api.documentation import auto, doc
 from api.groups import groups
 from api.policies import policies
 from api.positions import positions
@@ -12,6 +13,7 @@ from api.users import users
 from config import CONFIG
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
+from flask_restx import Api, Resource
 from http_exception import HTTPException
 
 
@@ -29,6 +31,8 @@ def create_flask_app() -> Flask:
     application.config.from_object(CONFIG)
     configure_logging()
 
+    auto.init_app(application)
+
     # Register blueprints
     application.register_blueprint(auth)
     application.register_blueprint(users)
@@ -38,6 +42,7 @@ def create_flask_app() -> Flask:
     application.register_blueprint(roles)
     application.register_blueprint(positions)
     application.register_blueprint(policies)
+    application.register_blueprint(doc)
 
     return application
 

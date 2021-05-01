@@ -8,10 +8,13 @@ from permissions import permissions
 from services import units_service as service
 from services.request_validators import content_type_validation
 
+from .documentation import auto
+
 units: Blueprint = Blueprint("units", __name__, url_prefix="/api/v1")
 
 
 @units.route("/units", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_units() -> Tuple[Any, int]:
@@ -22,6 +25,7 @@ def select_units() -> Tuple[Any, int]:
 
 
 @units.route("/units/<int:unit_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_single_unit(unit_id: int) -> Tuple[Any, int]:
@@ -29,6 +33,7 @@ def select_single_unit(unit_id: int) -> Tuple[Any, int]:
 
 
 @units.route("/units", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def insert_unit() -> Tuple[Any, int]:
@@ -39,6 +44,7 @@ def insert_unit() -> Tuple[Any, int]:
 
 
 @units.route("/units/<int:unit_id>", methods=["PUT", "PATCH"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def update_unit(unit_id: str) -> Tuple[Any, int]:
@@ -49,6 +55,7 @@ def update_unit(unit_id: str) -> Tuple[Any, int]:
 
 
 @units.route("/units/<int:unit_id>", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def delete_unit(unit_id: int) -> Tuple[Any, int]:

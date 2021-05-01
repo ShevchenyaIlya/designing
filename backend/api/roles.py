@@ -8,10 +8,13 @@ from permissions import permissions
 from services import roles_service as service
 from services.request_validators import content_type_validation
 
+from .documentation import auto
+
 roles: Blueprint = Blueprint("roles", __name__, url_prefix="/api/v1")
 
 
 @roles.route("/roles", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def select_roles() -> Tuple[Any, int]:
@@ -19,6 +22,7 @@ def select_roles() -> Tuple[Any, int]:
 
 
 @roles.route("/users-with-role/<int:role_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def select_users_with_roles(role_id: int) -> Tuple[Any, int]:
@@ -26,6 +30,7 @@ def select_users_with_roles(role_id: int) -> Tuple[Any, int]:
 
 
 @roles.route("/roles/<int:role_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def select_single_role(role_id: int) -> Tuple[Any, int]:
@@ -33,6 +38,7 @@ def select_single_role(role_id: int) -> Tuple[Any, int]:
 
 
 @roles.route("/roles", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def insert_role() -> Tuple[Any, int]:
@@ -43,6 +49,7 @@ def insert_role() -> Tuple[Any, int]:
 
 
 @roles.route("/roles/<int:role_id>", methods=["PUT", "PATCH"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def update_role(role_id: str) -> Tuple[Any, int]:
@@ -53,6 +60,7 @@ def update_role(role_id: str) -> Tuple[Any, int]:
 
 
 @roles.route("/roles/<int:role_id>", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def delete_role(role_id: int) -> Tuple[Any, int]:
@@ -60,6 +68,7 @@ def delete_role(role_id: int) -> Tuple[Any, int]:
 
 
 @roles.route("/role-policies/<int:role_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def select_role_policies(role_id: int) -> Tuple[Any, int]:
@@ -67,6 +76,7 @@ def select_role_policies(role_id: int) -> Tuple[Any, int]:
 
 
 @roles.route("/role-policies", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def set_role_policy() -> Tuple[Any, int]:
@@ -77,6 +87,7 @@ def set_role_policy() -> Tuple[Any, int]:
 
 
 @roles.route("/role-policies", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
 def delete_role_policy() -> Tuple[Any, int]:

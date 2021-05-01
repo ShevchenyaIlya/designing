@@ -8,10 +8,13 @@ from permissions import permissions
 from services import groups_service as service
 from services.request_validators import content_type_validation
 
+from .documentation import auto
+
 groups: Blueprint = Blueprint("groups", __name__, url_prefix="/api/v1")
 
 
 @groups.route("/groups", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_groups() -> Tuple[Any, int]:
@@ -19,6 +22,7 @@ def select_groups() -> Tuple[Any, int]:
 
 
 @groups.route("/users-in-group/<int:group_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_users_in_group(group_id: int) -> Tuple[Any, int]:
@@ -26,6 +30,7 @@ def select_users_in_group(group_id: int) -> Tuple[Any, int]:
 
 
 @groups.route("/groups/<int:group_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_single_group(group_id: int) -> Tuple[Any, int]:
@@ -33,6 +38,7 @@ def select_single_group(group_id: int) -> Tuple[Any, int]:
 
 
 @groups.route("/groups", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def insert_group() -> Tuple[Any, int]:
@@ -43,6 +49,7 @@ def insert_group() -> Tuple[Any, int]:
 
 
 @groups.route("/groups/<int:group_id>", methods=["PUT", "PATCH"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def update_group(group_id: str) -> Tuple[Any, int]:
@@ -53,6 +60,7 @@ def update_group(group_id: str) -> Tuple[Any, int]:
 
 
 @groups.route("/groups/<int:group_id>", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def delete_group(group_id: int) -> Tuple[Any, int]:
@@ -60,6 +68,7 @@ def delete_group(group_id: int) -> Tuple[Any, int]:
 
 
 @groups.route("/group-roles/<int:group_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_group_roles(group_id: int) -> Tuple[Any, int]:
@@ -67,6 +76,7 @@ def select_group_roles(group_id: int) -> Tuple[Any, int]:
 
 
 @groups.route("/group-roles", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def set_group_role() -> Tuple[Any, int]:
@@ -77,6 +87,7 @@ def set_group_role() -> Tuple[Any, int]:
 
 
 @groups.route("/group-roles", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def delete_user_role() -> Tuple[Any, int]:
