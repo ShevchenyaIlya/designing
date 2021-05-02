@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Tuple
 
 from api.v2.auth import api as api_auth
 from api.v2.departments import api as api_departments
@@ -29,7 +30,7 @@ def configure_logging():
     logging.getLogger("werkzeug").setLevel(logging.INFO)
 
 
-def create_flask_app() -> Flask:
+def create_flask_app() -> Tuple[Flask, Any]:
     """
     Factory for creating flask application instance
     """
@@ -88,8 +89,13 @@ def create_flask_app() -> Flask:
             application,
             version="1.0",
             title="RESTful API",
-            description="Base endpoints",
+            description="User management system, created using python flask framework",
+            contact="shevchenya.i@gmail.com",
+            linense="Protected by the best license",
+            default_mediatype="application/json",
             authorizations=authorizations,
+            default="Specifications",
+            default_label="Postman and swagger specification",
         )
         api.add_namespace(api_auth)
         api.add_namespace(api_units)
@@ -100,10 +106,22 @@ def create_flask_app() -> Flask:
         api.add_namespace(api_roles)
         api.add_namespace(api_groups)
 
-    return application
+        @api.route("/specification", endpoint="specification")
+        class APISpecification(Resource):
+            def get(self):
+                return api.__schema__
+
+        @api.route("/postman", endpoint="postman")
+        class APIPostman(Resource):
+            def get(self):
+                urlvars = False  # Build query strings in URLs
+                swagger = True  # Export Swagger specifications
+                return api.as_postman(urlvars=urlvars, swagger=swagger)
+
+    return application, api
 
 
-application = create_flask_app()
+application, api = create_flask_app()
 jwt = JWTManager(application)
 
 
