@@ -1,10 +1,21 @@
 import logging
 
+from api.v2.auth import api as api_auth
+from api.v2.departments import api as api_departments
 from config import CONFIG
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
 from flask_restx import Api, Resource
 from http_exception import HTTPException
+
+authorizations = {
+    "apikey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token",
+    }
+}
 
 
 def configure_logging():
@@ -24,7 +35,6 @@ def create_flask_app() -> Flask:
     version = application.config["APPLICATION_VERSION"]
 
     for module in [
-        "documentation",
         "auth",
         "departments",
         "groups",
@@ -37,32 +47,46 @@ def create_flask_app() -> Flask:
         api = __import__(f"api.{version}.{module}")
 
     api_version = getattr(api, version)
-    api_version.documentation.auto.init_app(application)
 
-    # Register blueprints
-    application.register_blueprint(api_version.auth.auth)
-    application.register_blueprint(
-        api_version.users.users, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(
-        api_version.departments.departments, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(
-        api_version.units.units, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(
-        api_version.groups.groups, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(
-        api_version.roles.roles, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(
-        api_version.positions.positions, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(
-        api_version.policies.policies, url_prefix=f"/api/{version}"
-    )
-    application.register_blueprint(api_version.documentation.doc)
+    if version == "v1":
+        from api.v1.documentation import auto, doc
+
+        application.register_blueprint(doc)
+        auto.init_app(application)
+
+        # Register blueprints
+        application.register_blueprint(api_version.auth.auth)
+        application.register_blueprint(
+            api_version.users.users, url_prefix=f"/api/{version}"
+        )
+        application.register_blueprint(
+            api_version.departments.departments, url_prefix=f"/api/{version}"
+        )
+        application.register_blueprint(
+            api_version.units.units, url_prefix=f"/api/{version}"
+        )
+        application.register_blueprint(
+            api_version.groups.groups, url_prefix=f"/api/{version}"
+        )
+        application.register_blueprint(
+            api_version.roles.roles, url_prefix=f"/api/{version}"
+        )
+        application.register_blueprint(
+            api_version.positions.positions, url_prefix=f"/api/{version}"
+        )
+        application.register_blueprint(
+            api_version.policies.policies, url_prefix=f"/api/{version}"
+        )
+    elif version == "v2":
+        api = Api(
+            application,
+            version="1.0",
+            title="RESTful API",
+            description="Base endpoints",
+            authorizations=authorizations,
+        )
+        api.add_namespace(api_auth)
+        api.add_namespace(api_departments)
 
     return application
 

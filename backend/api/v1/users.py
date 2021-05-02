@@ -104,6 +104,7 @@ def set_user_group() -> Tuple[Any, int]:
 @users.route("/user-groups", methods=["DELETE"])
 @auto.doc()
 @jwt_required()
+@permissions(Permission.MANAGE_USERS)
 def delete_user_group() -> Tuple[Any, int]:
     user_id = request.args.get("user_id", None)
     group_id = request.args.get("group_id", None)
