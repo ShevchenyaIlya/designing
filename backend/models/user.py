@@ -52,6 +52,7 @@ class UserModel(PostgreSQLHandler):
 
         for index, user in enumerate(users):
             users[index] = dict(user)
+            users[index]["register_date"] = str(users[index]["register_date"])
 
         return users
 
@@ -124,6 +125,7 @@ class UserModel(PostgreSQLHandler):
 
         for index, role in enumerate(roles):
             roles[index] = dict(role)
+            roles[index]["register_date"] = str(roles[index]["register_date"])
 
         return roles
 
@@ -156,12 +158,13 @@ class UserModel(PostgreSQLHandler):
         self.cursor.execute(
             self.get_query("user_group", "select_user_groups"), (user_id,)
         )
-        roles = self.cursor.fetchall()
+        groups = self.cursor.fetchall()
 
-        for index, role in enumerate(roles):
-            roles[index] = dict(role)
+        for index, role in enumerate(groups):
+            groups[index] = dict(role)
+            groups[index]["register_date"] = str(groups[index]["register_date"])
 
-        return roles
+        return groups
 
     def select_user_policies(self, user_id: int) -> List[Dict]:
         self.cursor.execute(

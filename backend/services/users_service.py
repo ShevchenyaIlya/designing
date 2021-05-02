@@ -76,6 +76,8 @@ def user_profile(user_identity: Dict) -> Dict:
     if not user:
         raise HTTPException("Such user does not exist", HTTPStatus.CONFLICT)
 
+    user["register_date"] = str(user["register_date"])
+
     return user
 
 

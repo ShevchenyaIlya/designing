@@ -5,6 +5,7 @@ from api.v2.departments import api as api_departments
 from api.v2.policies import api as api_policies
 from api.v2.positions import api as api_positions
 from api.v2.units import api as api_units
+from api.v2.users import api as api_users
 from config import CONFIG
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
@@ -93,6 +94,7 @@ def create_flask_app() -> Flask:
         api.add_namespace(api_departments)
         api.add_namespace(api_policies)
         api.add_namespace(api_positions)
+        api.add_namespace(api_users)
 
     return application
 
