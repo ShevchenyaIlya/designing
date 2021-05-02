@@ -1,9 +1,8 @@
-from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
-from flask import Blueprint, Response, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import request
+from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource, fields
 from permissions import permissions
 from services import users_service as service

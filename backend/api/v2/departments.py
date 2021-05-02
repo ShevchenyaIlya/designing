@@ -1,9 +1,8 @@
-from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import request
+from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource, fields
 from permissions import permissions
 from services import departments_service as service
@@ -44,7 +43,7 @@ class Departments(Resource):
             204: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Department exist or something went wrong",
-            422: "Unprocessable_entity. Invalid data for creating new department",
+            422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Create new department",
     )
@@ -79,7 +78,7 @@ class SingleDepartment(Resource):
             204: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
-            422: "Unprocessable_entity. Invalid data for creating new department",
+            422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Update single department",
     )
@@ -98,7 +97,7 @@ class SingleDepartment(Resource):
             204: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
-            422: "Unprocessable_entity. Invalid data for creating new department",
+            422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Update single department",
     )

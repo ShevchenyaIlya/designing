@@ -2,6 +2,7 @@ import logging
 
 from api.v2.auth import api as api_auth
 from api.v2.departments import api as api_departments
+from api.v2.units import api as api_units
 from config import CONFIG
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
@@ -86,6 +87,7 @@ def create_flask_app() -> Flask:
             authorizations=authorizations,
         )
         api.add_namespace(api_auth)
+        api.add_namespace(api_units)
         api.add_namespace(api_departments)
 
     return application
