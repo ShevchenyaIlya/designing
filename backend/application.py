@@ -3,6 +3,7 @@ import logging
 from api.v2.auth import api as api_auth
 from api.v2.departments import api as api_departments
 from api.v2.policies import api as api_policies
+from api.v2.positions import api as api_positions
 from api.v2.units import api as api_units
 from config import CONFIG
 from flask import Flask, Response, jsonify
@@ -91,6 +92,7 @@ def create_flask_app() -> Flask:
         api.add_namespace(api_units)
         api.add_namespace(api_departments)
         api.add_namespace(api_policies)
+        api.add_namespace(api_positions)
 
     return application
 
