@@ -75,7 +75,7 @@ class SingleDepartment(Resource):
         security="apikey",
         body=department_body,
         responses={
-            204: "Successfully execute update",
+            200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
             422: "Unprocessable entity. Invalid data for creating new department",
@@ -94,7 +94,7 @@ class SingleDepartment(Resource):
         security="apikey",
         body=department_body,
         responses={
-            204: "Successfully execute update",
+            200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
             422: "Unprocessable entity. Invalid data for creating new department",
@@ -112,7 +112,7 @@ class SingleDepartment(Resource):
     @api.doc(
         security="apikey",
         responses={
-            204: "Successfully execute update",
+            200: "Successfully execute delete operation",
             409: "Delete operation have no effect. Such department does not exist",
         },
         description="Delete single department",

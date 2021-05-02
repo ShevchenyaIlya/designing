@@ -39,7 +39,7 @@ class Units(Resource):
         security="apikey",
         body=unit_body,
         responses={
-            204: "Successfully execute creation",
+            200: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Unit exist or something went wrong",
             422: "Unprocessable entity. Invalid data for creating new unit",
@@ -74,7 +74,7 @@ class SingleUnit(Resource):
         security="apikey",
         body=unit_body,
         responses={
-            204: "Successfully execute update",
+            200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such unit does not exist",
             422: "Unprocessable entity. Invalid data for creating new unit",
@@ -93,7 +93,7 @@ class SingleUnit(Resource):
         security="apikey",
         body=unit_body,
         responses={
-            204: "Successfully execute update",
+            200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such unit does not exist",
             422: "Unprocessable entity. Invalid data for creating new unit",
@@ -111,7 +111,7 @@ class SingleUnit(Resource):
     @api.doc(
         security="apikey",
         responses={
-            204: "Successfully execute update",
+            200: "Successfully execute delete operation",
             409: "Delete operation have no effect. Such unit does not exist",
         },
         description="Delete single unit",
