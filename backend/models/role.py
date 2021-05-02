@@ -33,6 +33,7 @@ class RoleModel(PostgreSQLHandler):
 
         for index, user in enumerate(users):
             users[index] = dict(user)
+            users[index]["register_date"] = str(users[index]["register_date"])
 
         return users
 

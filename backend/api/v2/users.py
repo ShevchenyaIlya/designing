@@ -40,6 +40,14 @@ user_role_body = api.model(
     },
 )
 
+user_group_body = api.model(
+    "User group",
+    {
+        "user_id": fields.Integer(description="User identifier", required=True),
+        "group_id": fields.Integer(description="Group identifier", required=True),
+    },
+)
+
 
 @api.route("/profile", endpoint="users")
 class Users(Resource):
@@ -212,7 +220,7 @@ class SingleUserGroups(Resource):
 class UsersGroups(Resource):
     @api.doc(
         security="apikey",
-        body=user_role_body,
+        body=user_group_body,
         responses={
             200: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
