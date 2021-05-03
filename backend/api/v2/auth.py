@@ -36,16 +36,17 @@ class Login(Resource):
     @api.doc(
         body=login_body,
         responses={
-            200: "Successfully register new user",
+            200: "Successfully login",
             400: "Validation error. Invalid request body content",
             401: "Unauthorized. Wrong password",
             404: "Not found. User with such email does not exist",
+            415: "Unsupported media type",
         },
         description="User login endpoint",
     )
     def post(self) -> Tuple[Any, int]:
         """
-        User login endpoint
+        User login endpoint. Return jwt token
         """
 
         content_type_validation(request.headers["Content-Type"])
@@ -63,13 +64,17 @@ class Register(Resource):
             204: "Successfully login",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Wrong password format or user already exist",
-            422: "Unprocessable_entity. Invalid data for creating register new user",
+            415: "Unsupported media type",
+            422: "Unprocessable entity. Invalid data for creating register new user",
         },
         description="User registration",
     )
     @jwt_required()
     @permissions(Permission.CREATE_USERS)
     def post(self) -> Tuple[Any, int]:
+        """
+        User registration
+        """
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 

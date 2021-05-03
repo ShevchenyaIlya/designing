@@ -91,6 +91,7 @@ class UsersOperations(Resource):
             200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Update user profile",
@@ -110,6 +111,7 @@ class UsersOperations(Resource):
             200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Update user profile",
@@ -164,6 +166,7 @@ class UsersRoles(Resource):
         responses={
             200: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new user role",
         },
         description="Create new user role",
@@ -224,6 +227,7 @@ class UsersGroups(Resource):
         responses={
             200: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new user group",
         },
         description="Create new user group",

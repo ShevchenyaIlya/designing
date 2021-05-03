@@ -40,9 +40,10 @@ class Departments(Resource):
         security="apikey",
         body=department_body,
         responses={
-            204: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Department exist or something went wrong",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Create new department",
@@ -62,7 +63,8 @@ class SingleDepartment(Resource):
     @api.doc(
         security="apikey",
         responses={
-            200: "Successfully get single department",
+            200: "Successfully select department by identifier",
+            404: "Not found. Department with identifier does not exist",
         },
         description="Get single department",
     )
@@ -78,6 +80,7 @@ class SingleDepartment(Resource):
             200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Update single department",
@@ -97,6 +100,7 @@ class SingleDepartment(Resource):
             200: "Successfully execute update",
             400: "Validation error. Invalid request body content",
             409: "Conflict. Update operation have no effect. Such department does not exist",
+            415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new department",
         },
         description="Update single department",
