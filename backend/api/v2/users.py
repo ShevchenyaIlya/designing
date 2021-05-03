@@ -8,7 +8,7 @@ from permissions import permissions
 from services import users_service as service
 from services.request_validators import content_type_validation
 
-api = Namespace("Users", description="User related endpoints", path="/users")
+api = Namespace("Users", description="User related endpoints", path="/api/v2/users")
 
 email_body = api.model(
     "Email",

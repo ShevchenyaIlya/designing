@@ -8,7 +8,9 @@ from permissions import permissions
 from services import policies_service as service
 from services.request_validators import content_type_validation
 
-api = Namespace("Policies", description="Policy related endpoints", path="/policies")
+api = Namespace(
+    "Policies", description="Policy related endpoints", path="/api/v2/policies"
+)
 
 policy_body = api.model(
     "Policy",

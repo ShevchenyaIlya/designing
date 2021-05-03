@@ -8,7 +8,7 @@ from permissions import permissions
 from services import units_service as service
 from services.request_validators import content_type_validation
 
-api = Namespace("Units", description="Units related endpoints", path="/units")
+api = Namespace("Units", description="Units related endpoints", path="/api/v2/units")
 
 unit_body = api.model(
     "Units",

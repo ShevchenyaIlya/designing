@@ -9,7 +9,9 @@ from services import departments_service as service
 from services.request_validators import content_type_validation
 
 api = Namespace(
-    "Departments", description="Departments related endpoints", path="/departments"
+    "Departments",
+    description="Departments related endpoints",
+    path="/api/v2/departments",
 )
 
 department_body = api.model(

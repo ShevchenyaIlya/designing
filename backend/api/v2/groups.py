@@ -9,7 +9,7 @@ from permissions import permissions
 from services import groups_service as service
 from services.request_validators import content_type_validation
 
-api = Namespace("Groups", description="Group related endpoints", path="/groups")
+api = Namespace("Groups", description="Group related endpoints", path="/api/v2/groups")
 
 group_body = api.model(
     "Group",

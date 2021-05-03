@@ -8,7 +8,7 @@ from permissions import permissions
 from services import users_service as service
 from services.request_validators import content_type_validation
 
-api = Namespace("Auth", description="Authentication related endpoints", path="/")
+api = Namespace("Auth", description="Authentication related endpoints", path="/api/v2")
 
 
 login_body = api.model(

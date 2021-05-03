@@ -9,7 +9,7 @@ from permissions import permissions
 from services import roles_service as service
 from services.request_validators import content_type_validation
 
-api = Namespace("Roles", description="Role related endpoints", path="/roles")
+api = Namespace("Roles", description="Role related endpoints", path="/api/v2/roles")
 
 role_body = api.model(
     "Role",
@@ -24,6 +24,7 @@ role_policy_body = api.model(
     {
         "policy_id": fields.Integer(description="Policy identifier", required=True),
         "role_id": fields.Integer(description="Role identifier", required=True),
+        "department_id": fields.Integer(description="Role identifier", required=True),
     },
 )
 

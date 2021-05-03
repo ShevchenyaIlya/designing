@@ -9,7 +9,7 @@ from services import positions_service as service
 from services.request_validators import content_type_validation
 
 api = Namespace(
-    "Positions", description="Position related endpoints", path="/positions"
+    "Positions", description="Position related endpoints", path="/api/v2/positions"
 )
 
 position_body = api.model(
