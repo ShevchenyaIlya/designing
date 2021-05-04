@@ -37,7 +37,7 @@ def insert_department() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_department(body)), HTTPStatus.OK
+    return jsonify(service.insert_department(body)), HTTPStatus.CREATED
 
 
 @departments.route("/departments/<int:department_id>", methods=["PUT", "PATCH"])

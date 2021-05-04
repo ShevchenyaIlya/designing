@@ -37,7 +37,7 @@ def insert_policy() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_policy(body)), HTTPStatus.OK
+    return jsonify(service.insert_policy(body)), HTTPStatus.CREATED
 
 
 @policies.route("/policies/<int:policy_id>", methods=["PUT", "PATCH"])

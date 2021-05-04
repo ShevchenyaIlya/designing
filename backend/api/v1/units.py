@@ -45,7 +45,7 @@ def insert_unit() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_unit(body)), HTTPStatus.OK
+    return jsonify(service.insert_unit(body)), HTTPStatus.CREATED
 
 
 @units.route("/units/<int:unit_id>", methods=["PUT", "PATCH"])

@@ -34,4 +34,4 @@ def register() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.user_register(body)), HTTPStatus.NO_CONTENT
+    return jsonify(service.user_register(body)), HTTPStatus.CREATED

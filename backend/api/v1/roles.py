@@ -45,7 +45,7 @@ def insert_role() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_role(body)), HTTPStatus.OK
+    return jsonify(service.insert_role(body)), HTTPStatus.CREATED
 
 
 @roles.route("/roles/<int:role_id>", methods=["PUT", "PATCH"])
@@ -67,7 +67,7 @@ def delete_role(role_id: int) -> Tuple[Any, int]:
     return jsonify(service.delete_role(role_id)), HTTPStatus.OK
 
 
-@roles.route("/role-policies/<int:role_id>", methods=["GET"])
+@roles.route("/roles/policies/<int:role_id>", methods=["GET"])
 @auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
@@ -75,7 +75,7 @@ def select_role_policies(role_id: int) -> Tuple[Any, int]:
     return jsonify(service.select_role_policies(role_id)), HTTPStatus.OK
 
 
-@roles.route("/role-policies", methods=["POST"])
+@roles.route("/roles/policies", methods=["POST"])
 @auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)
@@ -86,7 +86,7 @@ def set_role_policy() -> Tuple[Any, int]:
     return jsonify(service.insert_role_policy(body)), HTTPStatus.OK
 
 
-@roles.route("/role-policies", methods=["DELETE"])
+@roles.route("/roles/policies", methods=["DELETE"])
 @auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_ROLES)

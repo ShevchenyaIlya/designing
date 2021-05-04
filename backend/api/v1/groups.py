@@ -45,7 +45,7 @@ def insert_group() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_group(body)), HTTPStatus.OK
+    return jsonify(service.insert_group(body)), HTTPStatus.CREATED
 
 
 @groups.route("/groups/<int:group_id>", methods=["PUT", "PATCH"])
@@ -67,7 +67,7 @@ def delete_group(group_id: int) -> Tuple[Any, int]:
     return jsonify(service.delete_group(group_id)), HTTPStatus.OK
 
 
-@groups.route("/group-roles/<int:group_id>", methods=["GET"])
+@groups.route("/groups/roles/<int:group_id>", methods=["GET"])
 @auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
@@ -75,7 +75,7 @@ def select_group_roles(group_id: int) -> Tuple[Any, int]:
     return jsonify(service.select_group_roles(group_id)), HTTPStatus.OK
 
 
-@groups.route("/group-roles", methods=["POST"])
+@groups.route("/groups/roles", methods=["POST"])
 @auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
@@ -86,7 +86,7 @@ def set_group_role() -> Tuple[Any, int]:
     return jsonify(service.insert_group_role(body)), HTTPStatus.OK
 
 
-@groups.route("/group-roles", methods=["DELETE"])
+@groups.route("/groups/roles", methods=["DELETE"])
 @auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)

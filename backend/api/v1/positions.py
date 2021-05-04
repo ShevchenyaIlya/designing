@@ -37,7 +37,7 @@ def insert_position() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_position(body)), HTTPStatus.OK
+    return jsonify(service.insert_position(body)), HTTPStatus.CREATED
 
 
 @positions.route("/positions/<int:position_id>", methods=["PUT", "PATCH"])
