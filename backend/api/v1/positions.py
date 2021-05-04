@@ -8,10 +8,13 @@ from permissions import permissions
 from services import positions_service as service
 from services.request_validators import content_type_validation
 
-positions: Blueprint = Blueprint("positions", __name__, url_prefix="/api/v1")
+from .documentation import auto
+
+positions: Blueprint = Blueprint("positions", __name__)
 
 
 @positions.route("/positions", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_POSITIONS)
 def select_units() -> Tuple[Any, int]:
@@ -19,6 +22,7 @@ def select_units() -> Tuple[Any, int]:
 
 
 @positions.route("/positions/<int:position_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_POSITIONS)
 def select_single_position(position_id: int) -> Tuple[Any, int]:
@@ -26,16 +30,18 @@ def select_single_position(position_id: int) -> Tuple[Any, int]:
 
 
 @positions.route("/positions", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_POSITIONS)
 def insert_position() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_position(body)), HTTPStatus.OK
+    return jsonify(service.insert_position(body)), HTTPStatus.CREATED
 
 
 @positions.route("/positions/<int:position_id>", methods=["PUT", "PATCH"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_POSITIONS)
 def update_position(position_id: str) -> Tuple[Any, int]:
@@ -46,6 +52,7 @@ def update_position(position_id: str) -> Tuple[Any, int]:
 
 
 @positions.route("/positions/<int:position_id>", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_POSITIONS)
 def delete_position(position_id: int) -> Tuple[Any, int]:

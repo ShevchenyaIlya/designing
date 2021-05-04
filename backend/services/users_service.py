@@ -76,6 +76,8 @@ def user_profile(user_identity: Dict) -> Dict:
     if not user:
         raise HTTPException("Such user does not exist", HTTPStatus.CONFLICT)
 
+    user["register_date"] = str(user["register_date"])
+
     return user
 
 
@@ -113,6 +115,56 @@ def update_user(body: Dict) -> Dict:
         )
 
     return body
+
+
+def update_user_single_field(body: Dict) -> Dict:
+    if not body.get("email", False):
+        raise HTTPException("Body must contain user email", HTTPStatus.BAD_REQUEST)
+
+    if (response := db.update_user(body)) is None:
+        raise HTTPException(
+            "You can't execute update operation with this data. Check that object with such identifiers exist.",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    if not response:
+        raise HTTPException(
+            "Update operation have no effect. Such user does not exist",
+            HTTPStatus.CONFLICT,
+        )
+
+    return body
+
+
+def update_user_department(body: Dict) -> Dict:
+    check_empty_request_body(body)
+
+    if not body.get("department_id", False):
+        raise HTTPException(
+            "Body must contain 'department_id' field", HTTPStatus.BAD_REQUEST
+        )
+
+    return update_user_single_field(body)
+
+
+def update_user_unit(body: Dict) -> Dict:
+    check_empty_request_body(body)
+
+    if not body.get("unit_id", False):
+        raise HTTPException("Body must contain 'unit_id' field", HTTPStatus.BAD_REQUEST)
+
+    return update_user_single_field(body)
+
+
+def update_user_position(body: Dict) -> Dict:
+    check_empty_request_body(body)
+
+    if not body.get("position_id", False):
+        raise HTTPException(
+            "Body must contain 'position_id' field", HTTPStatus.BAD_REQUEST
+        )
+
+    return update_user_single_field(body)
 
 
 def select_users() -> Dict:

@@ -8,20 +8,29 @@ from permissions import permissions
 from services import units_service as service
 from services.request_validators import content_type_validation
 
-units: Blueprint = Blueprint("units", __name__, url_prefix="/api/v1")
+from .documentation import auto
+
+units: Blueprint = Blueprint("units", __name__)
 
 
 @units.route("/units", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_units() -> Tuple[Any, int]:
-    content_type_validation(request.headers["Content-Type"])
-    body = request.get_json()
+    return jsonify(service.select_units()), HTTPStatus.OK
 
-    return jsonify(service.select_units(body)), HTTPStatus.OK
+
+@units.route("/units/department-units/<int:department_id>", methods=["GET"])
+@auto.doc()
+@jwt_required()
+@permissions(Permission.MANAGE_UNITS)
+def select_department_units(department_id: int) -> Tuple[Any, int]:
+    return jsonify(service.select_department_units(department_id)), HTTPStatus.OK
 
 
 @units.route("/units/<int:unit_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def select_single_unit(unit_id: int) -> Tuple[Any, int]:
@@ -29,16 +38,18 @@ def select_single_unit(unit_id: int) -> Tuple[Any, int]:
 
 
 @units.route("/units", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def insert_unit() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_unit(body)), HTTPStatus.OK
+    return jsonify(service.insert_unit(body)), HTTPStatus.CREATED
 
 
 @units.route("/units/<int:unit_id>", methods=["PUT", "PATCH"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def update_unit(unit_id: str) -> Tuple[Any, int]:
@@ -49,6 +60,7 @@ def update_unit(unit_id: str) -> Tuple[Any, int]:
 
 
 @units.route("/units/<int:unit_id>", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_UNITS)
 def delete_unit(unit_id: int) -> Tuple[Any, int]:

@@ -7,20 +7,12 @@ from models.unit import units as db
 from services.request_validators import check_body_content, check_empty_request_body
 
 
-def select_units(body: Dict) -> List:
-    """
-    If body content have department_id, than selects all department units, elsewhere select units in all departments
-    """
+def select_units() -> List:
+    return db.select_units()
 
-    if (
-        body is not None
-        and (department_id := body.get("department_id", None)) is not None
-    ):
-        units = db.select_department_units(department_id)
-    else:
-        units = db.select_units()
 
-    return units
+def select_department_units(department_id: int) -> List:
+    return db.select_department_units(department_id)
 
 
 def select_single_unit(unit_id: int):

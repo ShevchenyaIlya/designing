@@ -6,4 +6,6 @@ SELECT "user".first_name,
        department.description as department_description,
        unit.*
 FROM unit
-WHERE id=%s;
+INNER JOIN department ON (unit.department_id=department.id)
+INNER JOIN "user" ON ("user".id=unit.head_id)
+WHERE unit.id=%s;

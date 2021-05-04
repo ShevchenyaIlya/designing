@@ -1,18 +1,21 @@
 import logging
-import os
+from typing import Any, Tuple
 
-from api.auth import auth
-from api.departments import departments
-from api.groups import groups
-from api.policies import policies
-from api.positions import positions
-from api.roles import roles
-from api.units import units
-from api.users import users
 from config import CONFIG
+from enums import APIVersions
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
+from flask_restx import Api, Resource
 from http_exception import HTTPException
+
+authorizations = {
+    "apikey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token",
+    }
+}
 
 
 def configure_logging():
@@ -20,7 +23,7 @@ def configure_logging():
     logging.getLogger("werkzeug").setLevel(logging.INFO)
 
 
-def create_flask_app() -> Flask:
+def create_flask_app() -> Tuple[Flask, Any]:
     """
     Factory for creating flask application instance
     """
@@ -29,20 +32,70 @@ def create_flask_app() -> Flask:
     application.config.from_object(CONFIG)
     configure_logging()
 
-    # Register blueprints
-    application.register_blueprint(auth)
-    application.register_blueprint(users)
-    application.register_blueprint(departments)
-    application.register_blueprint(units)
-    application.register_blueprint(groups)
-    application.register_blueprint(roles)
-    application.register_blueprint(positions)
-    application.register_blueprint(policies)
+    version = application.config["APPLICATION_VERSION"]
 
-    return application
+    modules = [
+        "auth",
+        "departments",
+        "groups",
+        "policies",
+        "positions",
+        "roles",
+        "units",
+        "users",
+    ]
+
+    for module in modules:
+        api = __import__(f"api.{version}.{module}")
+
+    api_version = getattr(api, version)
+
+    if version == APIVersions.v1.value:
+        from api.v1.documentation import auto, doc
+
+        application.register_blueprint(doc)
+        auto.init_app(application)
+
+        # Register blueprints
+        for module in modules:
+            application.register_blueprint(
+                getattr(getattr(api_version, module), module),
+                url_prefix=f"/api/{version}",
+            )
+    elif version == APIVersions.v2.value:
+        api = Api(
+            application,
+            version="1.0",
+            title="RESTful API",
+            description="User management system, created using python flask framework",
+            contact="shevchenya.i@gmail.com",
+            linense="Protected by the best license",
+            default_mediatype="application/json",
+            authorizations=authorizations,
+            default="Specifications",
+            default_label="Postman and swagger specification",
+        )
+
+        # Register namespaces
+        for module in modules:
+            api.add_namespace(getattr(api_version, module).api)
+
+        @api.route("/specification", endpoint="specification")
+        class APISpecification(Resource):
+            def get(self):
+                return api.__schema__
+
+        @api.route("/postman", endpoint="postman")
+        class APIPostman(Resource):
+            def get(self):
+                urlvars = False  # Build query strings in URLs
+                swagger = True  # Export Swagger specifications
+                return api.as_postman(urlvars=urlvars, swagger=swagger)
+
+    return application, api
 
 
-application = create_flask_app()
+application, api = create_flask_app()
 jwt = JWTManager(application)
 
 

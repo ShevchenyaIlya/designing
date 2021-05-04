@@ -8,10 +8,13 @@ from permissions import permissions
 from services import departments_service as service
 from services.request_validators import content_type_validation
 
-departments: Blueprint = Blueprint("departments", __name__, url_prefix="/api/v1")
+from .documentation import auto
+
+departments: Blueprint = Blueprint("departments", __name__)
 
 
 @departments.route("/departments", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_DEPARTMENTS)
 def select_departments() -> Tuple[Any, int]:
@@ -19,6 +22,7 @@ def select_departments() -> Tuple[Any, int]:
 
 
 @departments.route("/departments/<int:department_id>", methods=["GET"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_DEPARTMENTS)
 def select_single_department(department_id: int) -> Tuple[Any, int]:
@@ -26,16 +30,18 @@ def select_single_department(department_id: int) -> Tuple[Any, int]:
 
 
 @departments.route("/departments", methods=["POST"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_DEPARTMENTS)
 def insert_department() -> Tuple[Any, int]:
     content_type_validation(request.headers["Content-Type"])
     body = request.get_json()
 
-    return jsonify(service.insert_department(body)), HTTPStatus.OK
+    return jsonify(service.insert_department(body)), HTTPStatus.CREATED
 
 
 @departments.route("/departments/<int:department_id>", methods=["PUT", "PATCH"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_DEPARTMENTS)
 def update_department(department_id: int) -> Tuple[Any, int]:
@@ -46,6 +52,7 @@ def update_department(department_id: int) -> Tuple[Any, int]:
 
 
 @departments.route("/departments/<int:department_id>", methods=["DELETE"])
+@auto.doc()
 @jwt_required()
 @permissions(Permission.MANAGE_DEPARTMENTS)
 def delete_department(department_id: int) -> Tuple[Any, int]:
