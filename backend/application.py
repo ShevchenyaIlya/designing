@@ -1,15 +1,8 @@
 import logging
 from typing import Any, Tuple
 
-from api.v2.auth import api as api_auth
-from api.v2.departments import api as api_departments
-from api.v2.groups import api as api_groups
-from api.v2.policies import api as api_policies
-from api.v2.positions import api as api_positions
-from api.v2.roles import api as api_roles
-from api.v2.units import api as api_units
-from api.v2.users import api as api_users
 from config import CONFIG
+from enums import APIVersions
 from flask import Flask, Response, jsonify
 from flask_jwt_extended import JWTManager
 from flask_restx import Api, Resource
@@ -41,7 +34,7 @@ def create_flask_app() -> Tuple[Flask, Any]:
 
     version = application.config["APPLICATION_VERSION"]
 
-    for module in [
+    modules = [
         "auth",
         "departments",
         "groups",
@@ -50,41 +43,26 @@ def create_flask_app() -> Tuple[Flask, Any]:
         "roles",
         "units",
         "users",
-    ]:
+    ]
+
+    for module in modules:
         api = __import__(f"api.{version}.{module}")
 
     api_version = getattr(api, version)
 
-    if version == "v1":
+    if version == APIVersions.v1.value:
         from api.v1.documentation import auto, doc
 
         application.register_blueprint(doc)
         auto.init_app(application)
 
         # Register blueprints
-        application.register_blueprint(api_version.auth.auth)
-        application.register_blueprint(
-            api_version.users.users, url_prefix=f"/api/{version}"
-        )
-        application.register_blueprint(
-            api_version.departments.departments, url_prefix=f"/api/{version}"
-        )
-        application.register_blueprint(
-            api_version.units.units, url_prefix=f"/api/{version}"
-        )
-        application.register_blueprint(
-            api_version.groups.groups, url_prefix=f"/api/{version}"
-        )
-        application.register_blueprint(
-            api_version.roles.roles, url_prefix=f"/api/{version}"
-        )
-        application.register_blueprint(
-            api_version.positions.positions, url_prefix=f"/api/{version}"
-        )
-        application.register_blueprint(
-            api_version.policies.policies, url_prefix=f"/api/{version}"
-        )
-    elif version == "v2":
+        for module in modules:
+            application.register_blueprint(
+                getattr(getattr(api_version, module), module),
+                url_prefix=f"/api/{version}",
+            )
+    elif version == APIVersions.v2.value:
         api = Api(
             application,
             version="1.0",
@@ -97,14 +75,10 @@ def create_flask_app() -> Tuple[Flask, Any]:
             default="Specifications",
             default_label="Postman and swagger specification",
         )
-        api.add_namespace(api_auth)
-        api.add_namespace(api_units)
-        api.add_namespace(api_departments)
-        api.add_namespace(api_policies)
-        api.add_namespace(api_positions)
-        api.add_namespace(api_users)
-        api.add_namespace(api_roles)
-        api.add_namespace(api_groups)
+
+        # Register namespaces
+        for module in modules:
+            api.add_namespace(getattr(api_version, module).api)
 
         @api.route("/specification", endpoint="specification")
         class APISpecification(Resource):
