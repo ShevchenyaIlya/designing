@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
@@ -52,7 +53,7 @@ class Login(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.user_login(body)
+        return service.user_login(body), HTTPStatus.OK
 
 
 @api.route("/register", methods=["POST"])
@@ -61,7 +62,7 @@ class Register(Resource):
         body=register_body,
         security="apikey",
         responses={
-            204: "Successfully login",
+            201: "Successfully register",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Wrong password format or user already exist",
             415: "Unsupported media type",
@@ -78,4 +79,4 @@ class Register(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.user_register(body)
+        return service.user_register(body), HTTPStatus.CREATED

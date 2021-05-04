@@ -2,8 +2,8 @@ from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import request
+from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource, fields, reqparse
 from permissions import permissions
 from services import groups_service as service
@@ -40,13 +40,13 @@ class Groups(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self) -> Tuple[Any, int]:
-        return service.select_groups()
+        return service.select_groups(), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
         body=group_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Group already exist or something went wrong",
             415: "Unsupported media type",
@@ -60,7 +60,7 @@ class Groups(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_group(body)
+        return service.insert_group(body), HTTPStatus.CREATED
 
 
 @api.route("/users-in-group/<int:group_id>")
@@ -76,7 +76,7 @@ class UsersInGroup(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self, group_id: int) -> Tuple[Any, int]:
-        return service.select_users_in_group(group_id)
+        return service.select_users_in_group(group_id), HTTPStatus.OK
 
 
 @api.route("/<int:group_id>")
@@ -92,7 +92,7 @@ class SingleGroup(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self, group_id: int) -> Tuple[Any, int]:
-        return service.select_single_group(group_id)
+        return service.select_single_group(group_id), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -112,7 +112,7 @@ class SingleGroup(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_group(group_id, body)
+        return service.update_group(group_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -132,7 +132,7 @@ class SingleGroup(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_group(group_id, body)
+        return service.update_group(group_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -145,7 +145,7 @@ class SingleGroup(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def delete(self, group_id: int) -> Tuple[Any, int]:
-        return service.delete_group(group_id)
+        return service.delete_group(group_id), HTTPStatus.OK
 
 
 @api.route("/roles/<int:group_id>")
@@ -161,7 +161,7 @@ class SingleGroupRole(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self, group_id: int) -> Tuple[Any, int]:
-        return service.select_group_roles(group_id)
+        return service.select_group_roles(group_id), HTTPStatus.OK
 
 
 group_role_parser = reqparse.RequestParser()
@@ -175,7 +175,7 @@ class RolePolicies(Resource):
         security="apikey",
         body=group_role_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new group role",
@@ -188,7 +188,7 @@ class RolePolicies(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_group_role(body)
+        return service.insert_group_role(body), HTTPStatus.CREATED
 
     @api.doc(
         security="apikey",
@@ -206,4 +206,4 @@ class RolePolicies(Resource):
         group_id = request.args.get("group_id", None)
         role_id = request.args.get("role_id", None)
 
-        return service.delete_group_role(group_id, role_id)
+        return service.delete_group_role(group_id, role_id), HTTPStatus.OK

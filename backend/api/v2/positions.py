@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
@@ -33,13 +34,13 @@ class Policy(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_POSITIONS)
     def get(self) -> Tuple[Any, int]:
-        return service.select_positions()
+        return service.select_positions(), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
         body=position_body,
         responses={
-            204: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Position exist or something went wrong",
             415: "Unsupported media type",
@@ -53,7 +54,7 @@ class Policy(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_position(body)
+        return service.insert_position(body), HTTPStatus.CREATED
 
 
 @api.route("/<int:position_id>")
@@ -69,7 +70,7 @@ class SinglePosition(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_POSITIONS)
     def get(self, position_id: int) -> Tuple[Any, int]:
-        return service.select_single_position(position_id)
+        return service.select_single_position(position_id), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -89,7 +90,7 @@ class SinglePosition(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_position(position_id, body)
+        return service.update_position(position_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -109,7 +110,7 @@ class SinglePosition(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_position(position_id, body)
+        return service.update_position(position_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -122,4 +123,4 @@ class SinglePosition(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_POSITIONS)
     def delete(self, position_id: int) -> Tuple[Any, int]:
-        return service.delete_position(position_id)
+        return service.delete_position(position_id), HTTPStatus.OK

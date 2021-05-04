@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
@@ -36,7 +37,7 @@ class Departments(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_DEPARTMENTS)
     def get(self) -> Tuple[Any, int]:
-        return service.select_departments()
+        return service.select_departments(), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -56,7 +57,7 @@ class Departments(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_department(body)
+        return service.insert_department(body), HTTPStatus.CREATED
 
 
 @api.route("/<int:department_id>")
@@ -73,7 +74,7 @@ class SingleDepartment(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_DEPARTMENTS)
     def get(self, department_id: int) -> Tuple[Any, int]:
-        return service.select_single_department(department_id)
+        return service.select_single_department(department_id), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -93,7 +94,7 @@ class SingleDepartment(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_department(department_id, body)
+        return service.update_department(department_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -113,7 +114,7 @@ class SingleDepartment(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_department(department_id, body)
+        return service.update_department(department_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -126,4 +127,4 @@ class SingleDepartment(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_DEPARTMENTS)
     def delete(self, department_id: int) -> Tuple[Any, int]:
-        return service.delete_department(department_id)
+        return service.delete_department(department_id), HTTPStatus.OK

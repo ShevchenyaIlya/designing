@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
@@ -36,13 +37,13 @@ class Policies(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_POLICIES)
     def get(self) -> Tuple[Any, int]:
-        return service.select_policies()
+        return service.select_policies(), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
         body=policy_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Policy already exist or something went wrong",
             415: "Unsupported media type",
@@ -56,7 +57,7 @@ class Policies(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_policy(body)
+        return service.insert_policy(body), HTTPStatus.CREATED
 
 
 @api.route("/<int:policy_id>")
@@ -72,7 +73,7 @@ class SingleDepartment(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_POLICIES)
     def get(self, policy_id: int) -> Tuple[Any, int]:
-        return service.select_single_policy(policy_id)
+        return service.select_single_policy(policy_id), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -92,7 +93,7 @@ class SingleDepartment(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_policy(policy_id, body)
+        return service.update_policy(policy_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -112,7 +113,7 @@ class SingleDepartment(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_policy(policy_id, body)
+        return service.update_policy(policy_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -125,4 +126,4 @@ class SingleDepartment(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_POLICIES)
     def delete(self, policy_id: int) -> Tuple[Any, int]:
-        return service.delete_policy(policy_id)
+        return service.delete_policy(policy_id), HTTPStatus.OK

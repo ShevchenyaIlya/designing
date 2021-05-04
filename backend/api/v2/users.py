@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
@@ -62,7 +63,7 @@ class Users(Resource):
     def get(self) -> Tuple[Any, int]:
         user_identity = get_jwt_identity()
 
-        return service.user_profile(user_identity)
+        return service.user_profile(user_identity), HTTPStatus.OK
 
 
 @api.route("/")
@@ -82,7 +83,7 @@ class UsersOperations(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.delete_user(body)
+        return service.delete_user(body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -102,7 +103,7 @@ class UsersOperations(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_user(body)
+        return service.update_user(body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -122,7 +123,7 @@ class UsersOperations(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_user(body)
+        return service.update_user(body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -134,7 +135,7 @@ class UsersOperations(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_USERS)
     def get(self) -> Tuple[Any, int]:
-        return service.select_users()
+        return service.select_users(), HTTPStatus.OK
 
 
 user_role_parser = reqparse.RequestParser()
@@ -155,7 +156,7 @@ class SingleUserRoles(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_USERS)
     def get(self, user_id: int) -> Tuple[Any, int]:
-        return service.select_user_roles(user_id)
+        return service.select_user_roles(user_id), HTTPStatus.OK
 
 
 @api.route("/user-roles")
@@ -164,7 +165,7 @@ class UsersRoles(Resource):
         security="apikey",
         body=user_role_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new user role",
@@ -177,7 +178,7 @@ class UsersRoles(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_user_role(body)
+        return service.insert_user_role(body), HTTPStatus.CREATED
 
     @api.doc(
         security="apikey",
@@ -195,7 +196,7 @@ class UsersRoles(Resource):
         user_id = request.args.get("user_id", None)
         role_id = request.args.get("role_id", None)
 
-        return service.delete_user_role(user_id, role_id)
+        return service.delete_user_role(user_id, role_id), HTTPStatus.OK
 
 
 user_group_parser = reqparse.RequestParser()
@@ -216,7 +217,7 @@ class SingleUserGroups(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_USERS)
     def get(self, user_id: int) -> Tuple[Any, int]:
-        return service.select_user_groups(user_id)
+        return service.select_user_groups(user_id), HTTPStatus.OK
 
 
 @api.route("/user-groups")
@@ -225,7 +226,7 @@ class UsersGroups(Resource):
         security="apikey",
         body=user_group_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new user group",
@@ -238,7 +239,7 @@ class UsersGroups(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_user_group(body)
+        return service.insert_user_group(body), HTTPStatus.CREATED
 
     @api.doc(
         security="apikey",
@@ -256,4 +257,4 @@ class UsersGroups(Resource):
         user_id = request.args.get("user_id", None)
         group_id = request.args.get("group_id", None)
 
-        return service.delete_user_group(user_id, group_id)
+        return service.delete_user_group(user_id, group_id), HTTPStatus.OK

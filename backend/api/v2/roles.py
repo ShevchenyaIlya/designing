@@ -2,8 +2,8 @@ from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import request
+from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource, fields, reqparse
 from permissions import permissions
 from services import roles_service as service
@@ -41,13 +41,13 @@ class Roles(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self) -> Tuple[Any, int]:
-        return service.select_roles()
+        return service.select_roles(), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
         body=role_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             403: "Forbidden. Role already exist or something went wrong",
             415: "Unsupported media type",
@@ -61,7 +61,7 @@ class Roles(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_role(body)
+        return service.insert_role(body), HTTPStatus.CREATED
 
 
 @api.route("/users-with-role/<int:role_id>")
@@ -77,7 +77,7 @@ class UsersWithRole(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self, role_id: int) -> Tuple[Any, int]:
-        return service.select_users_with_role(role_id)
+        return service.select_users_with_role(role_id), HTTPStatus.OK
 
 
 @api.route("/<int:role_id>")
@@ -93,7 +93,7 @@ class SingleRole(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self, role_id: int) -> Tuple[Any, int]:
-        return service.select_single_role(role_id)
+        return service.select_single_role(role_id), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -113,7 +113,7 @@ class SingleRole(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_role(role_id, body)
+        return service.update_role(role_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -133,7 +133,7 @@ class SingleRole(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_role(role_id, body)
+        return service.update_role(role_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -146,7 +146,7 @@ class SingleRole(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def delete(self, role_id: int) -> Tuple[Any, int]:
-        return service.delete_role(role_id)
+        return service.delete_role(role_id), HTTPStatus.OK
 
 
 @api.route("/policies/<int:role_id>")
@@ -162,7 +162,7 @@ class SingleRolePolicy(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_ROLES)
     def get(self, role_id: int) -> Tuple[Any, int]:
-        return service.select_role_policies(role_id)
+        return service.select_role_policies(role_id), HTTPStatus.OK
 
 
 role_policies_parser = reqparse.RequestParser()
@@ -176,7 +176,7 @@ class RolePolicies(Resource):
         security="apikey",
         body=role_policy_body,
         responses={
-            200: "Successfully execute creation",
+            201: "Successfully execute creation",
             400: "Validation error. Invalid request body content",
             415: "Unsupported media type",
             422: "Unprocessable entity. Invalid data for creating new role policy",
@@ -189,7 +189,7 @@ class RolePolicies(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_role_policy(body)
+        return service.insert_role_policy(body), HTTPStatus.CREATED
 
     @api.doc(
         security="apikey",
@@ -207,4 +207,4 @@ class RolePolicies(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.delete_role_policy(body)
+        return service.delete_role_policy(body), HTTPStatus.OK

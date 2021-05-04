@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, Tuple
 
 from enums import Permission
@@ -33,7 +34,7 @@ class Units(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_UNITS)
     def get(self) -> Tuple[Any, int]:
-        return service.select_units()
+        return service.select_units(), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -53,7 +54,7 @@ class Units(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.insert_unit(body)
+        return service.insert_unit(body), HTTPStatus.CREATED
 
 
 @api.route("/<int:unit_id>")
@@ -69,7 +70,7 @@ class SingleUnit(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_UNITS)
     def get(self, unit_id: int) -> Tuple[Any, int]:
-        return service.select_single_unit(unit_id)
+        return service.select_single_unit(unit_id), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -89,7 +90,7 @@ class SingleUnit(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_unit(unit_id, body)
+        return service.update_unit(unit_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -109,7 +110,7 @@ class SingleUnit(Resource):
         content_type_validation(request.headers["Content-Type"])
         body = request.get_json()
 
-        return service.update_unit(unit_id, body)
+        return service.update_unit(unit_id, body), HTTPStatus.OK
 
     @api.doc(
         security="apikey",
@@ -122,7 +123,7 @@ class SingleUnit(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_UNITS)
     def delete(self, unit_id: int) -> Tuple[Any, int]:
-        return service.delete_unit(unit_id)
+        return service.delete_unit(unit_id), HTTPStatus.OK
 
 
 @api.route("/department-units/<int:department_id>")
@@ -138,4 +139,4 @@ class SingleDepartmentUnits(Resource):
     @jwt_required()
     @permissions(Permission.MANAGE_UNITS)
     def get(self, department_id: int) -> Tuple[Any, int]:
-        return service.select_department_units(department_id)
+        return service.select_department_units(department_id), HTTPStatus.OK
