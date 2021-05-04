@@ -50,11 +50,11 @@
         },
         "flask-jwt-extended": {
             "hashes": [
-                "sha256:77ca23f23e80480ea42b9c1d9b0fca214e08db7192583e782c2421416b4a4655",
-                "sha256:f952f4ebd449182431c6755acfb7cbb52b8034df7a9f9ef95eb51ccfc1e235b0"
+                "sha256:8256f368427ca22d7f4da84d56e27eb678960ca2c34cf691c0baccce55ce72e6",
+                "sha256:b227af04db0ef4b795d8df5362ae84eef7da71694ed55b9d8559ee4abb895b53"
             ],
             "index": "pypi",
-            "version": "==4.1.0"
+            "version": "==4.2.0"
         },
         "flask-restx": {
             "hashes": [
