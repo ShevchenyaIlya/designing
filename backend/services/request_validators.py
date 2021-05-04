@@ -26,5 +26,5 @@ def check_body_content(body: Dict, *, fields: List) -> None:
 
     if any(field not in body for field in fields):
         raise HTTPException(
-            "Incorrect body content for creating new department", HTTPStatus.BAD_REQUEST
+            "Incorrect body content for execute this operation", HTTPStatus.BAD_REQUEST
         )
