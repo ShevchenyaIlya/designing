@@ -121,4 +121,4 @@ def after_request(response: Response) -> Response:
 
 if __name__ == "__main__":
     application.debug = True
-    application.run()
+    application.run(threaded=True)
