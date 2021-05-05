@@ -9,6 +9,7 @@ flask = "*"
 flask-jwt-extended = "*"
 flask-restx = "*"
 flask-selfdoc = "*"
+gunicorn = "*"
 
 [dev-packages]
 
